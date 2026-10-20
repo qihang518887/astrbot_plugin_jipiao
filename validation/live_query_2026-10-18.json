@@ -1,0 +1,21 @@
+{
+  "mode": "real",
+  "route": ["PEK", "SHA"],
+  "date": "2026-12-01",
+  "checked_at": "2026-10-18T19:12:05.764004+08:00",
+  "returned_count": 5,
+  "best": {
+    "flight_no": "HU7601",
+    "airline": "Hainan Airlines",
+    "airline_code": "HU",
+    "dep_time": "07:25",
+    "arr_time": "09:35",
+    "arr_date": "2026-12-01",
+    "dep_airport": "PEK",
+    "arr_airport": "SHA",
+    "price": 2510,
+    "currency": "CNY",
+    "source": "Google Flights / fli"
+  },
+  "note": "Saved from the successful smoke command output. This is one query, not a market-wide best-price claim. No QQ message was sent."
+}

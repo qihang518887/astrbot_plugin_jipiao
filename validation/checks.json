@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-18",
+  "plugin_version": "0.1.1",
+  "python": "3.12.13",
+  "astrbot_local_version": "4.29.1",
+  "fli_local_distribution_version": "0.10.0",
+  "pytest": {
+    "command": ".venv/Scripts/python.exe -m pytest -q",
+    "working_directory": "astrbot_plugin_jipiao",
+    "passed": 67,
+    "failed": 0,
+    "warnings": ["AstrBot audioop deprecation", "AstrBot register_star decorator deprecation"],
+    "scope": "Offline tests; real AstrBot imports, command parameter parser, message chain and fli models; controlled flight and delivery callbacks. Proxy tests also use a real fli HTTP client against a local HTTP server."
+  },
+  "ruff": {"check": "passed", "format": "applied"},
+  "live_flight_query": "live_query_2026-10-18.json",
+  "live_proxy_query": "live_proxy_query_2026-10-18.json",
+  "qq_login_tested": false,
+  "qq_delivery_tested": false,
+  "long_running_monitor_tested": false
+}

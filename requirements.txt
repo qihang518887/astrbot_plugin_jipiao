@@ -1,0 +1,3 @@
+# Install the inspected sibling fli checkout into AstrBot's interpreter first.
+# See README.md. The distribution name is flights, not fli.
+flights==0.10.0

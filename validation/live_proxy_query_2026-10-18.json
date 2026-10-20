@@ -1,0 +1,27 @@
+{
+  "mode": "real",
+  "route": ["PEK", "SHA"],
+  "date": "2026-12-01",
+  "checked_at": "2026-10-18T22:25:04.396571+08:00",
+  "returned_count": 5,
+  "best": {
+    "flight_no": "HU7601",
+    "airline": "Hainan Airlines",
+    "airline_code": "HU",
+    "dep_time": "07:25",
+    "arr_time": "09:35",
+    "arr_date": "2026-12-01",
+    "dep_airport": "PEK",
+    "arr_airport": "SHA",
+    "price": 2510,
+    "currency": "CNY",
+    "source": "Google Flights / fli"
+  },
+  "proxy_environment": {
+    "HTTPS_PROXY": "http://127.0.0.1:7897",
+    "HTTP_PROXY": "",
+    "ALL_PROXY": "",
+    "NO_PROXY": "localhost,127.0.0.1,::1"
+  },
+  "note": "Saved from successful v0.1.1 smoke output with HTTPS_PROXY as the only configured proxy. No QQ message was sent."
+}

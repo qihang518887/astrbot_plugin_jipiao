@@ -1,0 +1,53 @@
+"""Run one explicit query without creating tasks or sending any messages."""
+
+import argparse
+import asyncio
+import json
+from datetime import datetime, timedelta
+
+from .algorithm import CHINA_TZ
+from .fetcher import (
+    fetch_mock_flights,
+    fetch_raw_flights,
+    filter_and_get_lowest,
+    normalize_airlines,
+    validate_time_window,
+)
+
+
+async def main():
+    parser = argparse.ArgumentParser(description="机票插件单次查询；不会发送 QQ 消息")
+    parser.add_argument("--dep", default="PEK")
+    parser.add_argument("--arr", default="SHA")
+    parser.add_argument(
+        "--date", default=(datetime.now(CHINA_TZ) + timedelta(days=30)).strftime("%Y-%m-%d")
+    )
+    parser.add_argument("--time-window", default=None)
+    parser.add_argument("--airlines", default=None)
+    parser.add_argument("--mock", action="store_true", help="使用明确标注的模拟报价")
+    args = parser.parse_args()
+    window = validate_time_window(args.time_window)
+    airlines = normalize_airlines(args.airlines)
+    fetcher = fetch_mock_flights if args.mock else fetch_raw_flights
+    flights = await fetcher(args.dep, args.arr, args.date)
+    print(
+        json.dumps(
+            {
+                "mode": "mock" if args.mock else "real",
+                "route": [args.dep, args.arr],
+                "date": args.date,
+                "checked_at": datetime.now(CHINA_TZ).isoformat(),
+                "returned_count": len(flights),
+                "best": filter_and_get_lowest(flights, window, airlines),
+                "note": "模拟数据，不可购票"
+                if args.mock
+                else "本次返回结果中的最低价，不代表全网最低价",
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

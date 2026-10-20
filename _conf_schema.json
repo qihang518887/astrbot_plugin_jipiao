@@ -1,0 +1,21 @@
+{
+  "data_source": {
+    "description": "票价数据源",
+    "type": "string",
+    "default": "fli",
+    "options": ["fli", "mock"],
+    "hint": "fli 为真实查询；mock 只生成明确标注的模拟报价。两种模式数据库独立，切换后仅当前模式的任务运行。"
+  },
+  "round_interval_seconds": {
+    "description": "每轮结束后的等待秒数",
+    "type": "int",
+    "default": 1800,
+    "hint": "最低60秒。单个用户的实际检查周期还包含全轮查询及任务间隔耗时。"
+  },
+  "task_delay_seconds": {
+    "description": "任务间隔秒数",
+    "type": "int",
+    "default": 30,
+    "hint": "最低1秒，实际增加-1至+2秒抖动。真实数据建议保持30秒。"
+  }
+}

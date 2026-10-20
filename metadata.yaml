@@ -1,0 +1,6 @@
+name: astrbot_plugin_jipiao
+display_name: 机票低价监控
+desc: 单程直飞机票监控，支持目标价、观察策略及 QQ 主动提醒。
+version: v0.2.0
+author: Local
+astrbot_version: ">=4.29.1"
