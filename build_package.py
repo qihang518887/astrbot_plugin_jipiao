@@ -22,6 +22,7 @@ def main():
         root / "pyproject.toml",
         *fli_files,
         *root.glob("tests/*.py"),
+        *root.glob("experiments/*.py"),
         *root.glob("validation/*.json"),
     ]
     with ZipFile(target, "w", ZIP_DEFLATED) as archive:

@@ -20,6 +20,8 @@ from astrbot.core.platform.message_type import MessageType
 from .algorithm import CHINA_TZ, task_phase
 from .database import FlightDB
 from .fetcher import (
+    describe_itinerary,
+    describe_scope,
     fetch_mock_flights,
     fetch_raw_flights,
     filter_and_get_lowest,
@@ -30,16 +32,22 @@ from .fetcher import (
 from .scheduler import MonitorScheduler, NotificationNotReady
 
 USAGE = (
-    "用法：/机票监控 出发地 到达地 YYYY-MM-DD [时间段] [航司] [目标价]\n"
+    "用法：/机票监控 出发地 到达地 YYYY-MM-DD [时间段] [航司] [目标价] [直飞|接受经停|接受中转|接受经停与中转]\n"
     "不限制的可选项用 - 占位；日期必须晚于北京时间今天。\n"
     "示例：/机票监控 北京 上海 2026-12-01 08:00-18:00 国航,东航 500\n"
     "只设目标价：/机票监控 PEK SHA 2026-12-01 - - 500\n"
-    "不设目标价将使用37%观察策略。"
+    "不设目标价将使用37%观察策略。默认只监控直飞；末尾填写 接受经停、接受中转 或 接受经停与中转 才纳入非直飞行程。"
 )
 
 
 def validate_settings(
-    dep_city, arr_city, flight_date, time_window="-", airlines="-", target_price="-"
+    dep_city,
+    arr_city,
+    flight_date,
+    time_window="-",
+    airlines="-",
+    target_price="-",
+    stop_policy="直飞",
 ):
     """Validate command input before replacing any existing task.
 
@@ -50,6 +58,7 @@ def validate_settings(
         time_window: Inclusive local departure interval, or '-'.
         airlines: Comma-separated airline aliases or codes, or '-'.
         target_price: Positive whole-yuan threshold, or '-'.
+        stop_policy: '直飞' by default, or '接受经停', '接受中转', '接受经停与中转'.
 
     Returns:
         Normalized database keyword arguments.
@@ -69,6 +78,21 @@ def validate_settings(
     arr_codes = resolve_airports(arr_city)
     if set(dep_codes) & set(arr_codes):
         raise ValueError("出发地和到达地不能包含相同机场。")
+    policy = (stop_policy or "直飞").strip()
+    if policy in {"直飞"}:
+        allow_stopovers = False
+        allow_connections = False
+    elif policy in {"经停", "接受经停"}:
+        allow_stopovers = True
+        allow_connections = False
+    elif policy in {"中转", "接受中转"}:
+        allow_stopovers = False
+        allow_connections = True
+    elif policy in {"经停与中转", "接受经停与中转", "经停中转", "不限"}:
+        allow_stopovers = True
+        allow_connections = True
+    else:
+        raise ValueError("航程类型请填写 直飞、接受经停、接受中转 或 接受经停与中转。")
     target = None
     if target_price != "-":
         if not re.fullmatch(r"[0-9]{1,7}", target_price) or int(target_price) <= 0:
@@ -81,10 +105,12 @@ def validate_settings(
         "time_window": validate_time_window(time_window),
         "airlines": normalize_airlines(airlines),
         "target_price": target,
+        "allow_stopovers": allow_stopovers,
+        "allow_connections": allow_connections,
     }
 
 
-@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.2.1")
+@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.3.3")
 class JipiaoPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
@@ -154,11 +180,12 @@ class JipiaoPlugin(Star):
         time_window: str = "-",
         airlines: str = "-",
         target_price: str = "-",
+        stop_policy: str = "直飞",
     ):
         """设置单程机票监控；可选参数用 - 占位。"""
         try:
             settings = validate_settings(
-                dep_city, arr_city, flight_date, time_window, airlines, target_price
+                dep_city, arr_city, flight_date, time_window, airlines, target_price, stop_policy
             )
         except (ValueError, ImportError) as exc:
             message = (
@@ -180,13 +207,20 @@ class JipiaoPlugin(Star):
             else "37%观察策略模式（经验规则，不保证最低买入价）"
         )
         prefix = "【模拟模式，不是真实票价】\n" if self.mock else ""
+        scope_text = describe_scope(settings["allow_stopovers"], settings["allow_connections"])
+        scope_detail = (
+            f"航程类型：{scope_text}（含直飞），可能跨境或过夜；无结果时不自动放宽范围。\n"
+            if (settings["allow_stopovers"] or settings["allow_connections"])
+            else "航程类型：仅直飞；无直飞报价时继续等待，不自动监控经停或中转。\n"
+        )
         yield event.plain_result(
             f"{prefix}已开启监控"
             + ("，已覆盖您原有的监控任务。" if existed else "。")
             + f"\n{settings['dep_city']} → {settings['arr_city']}｜{flight_date}\n"
             + f"出发机场：{','.join(resolve_airports(dep_city))}；到达机场：{','.join(resolve_airports(arr_city))}\n"
             + f"起飞时段：{settings['time_window'] or '不限'}；航司：{settings['airlines'] or '不限'}\n"
-            + f"{mode}\n单程、1成人、经济舱、直飞、人民币。\n"
+            + f"{mode}\n单程、1成人、经济舱、人民币。\n"
+            + scope_detail
             + "提醒发送到本次设置所在的会话；同一平台账号每人一个任务。\n"
             + "后台依次检查，出发日北京时间零点结束。/我的监控 可查进度。"
         )
@@ -207,10 +241,12 @@ class JipiaoPlugin(Star):
             else "尚未查询"
         )
         best = json.loads(task["last_best_json"]) if task["last_best_json"] else None
+        scope_text = describe_scope(bool(task["allow_stopovers"]), bool(task["allow_connections"]))
         text = (
             ("【模拟模式，不是真实票价】\n" if self.mock else "")
             + f"{task['dep_city']} → {task['arr_city']}｜{task['flight_date']}\n"
             + f"时间段：{task['time_window'] or '不限'}；航司：{task['airlines'] or '不限'}\n"
+            + f"航程类型：{scope_text}\n"
             + f"目标价：{'¥' + str(task['target_price']) if task['target_price'] is not None else '未设置'}\n"
             + f"当前阶段：{phase}\n观察期最低3次：{recorded}\n"
             + f"上次提交推送价格：{'¥' + str(task['last_pushed_price']) if task['last_pushed_price'] is not None else '暂无'}\n"
@@ -250,8 +286,10 @@ class JipiaoPlugin(Star):
         flight_date: str,
         time_window: str = "-",
         airlines: str = "-",
+        allow_stopovers: bool = False,
+        allow_connections: bool = False,
     ) -> str:
-        """实时查询指定航线与日期的机票价格与直飞航班信息。当用户询问某天从某地到某地的机票或价格时调用。
+        """查询机票，默认先查直飞；无直飞报价时依次查询经停备选、中转备选。备选查询不代表用户同意监控经停或中转。须告知停靠机场和跨日到达，不得保证同航班号不换机。
 
         Args:
             dep_city(string): 出发城市名称或机场三字码，例如北京、上海、PEK
@@ -259,6 +297,8 @@ class JipiaoPlugin(Star):
             flight_date(string): 出发日期，格式必须为 YYYY-MM-DD，例如 2026-11-25
             time_window(string): 可选出发时段，格式为 HH:MM-HH:MM，不限填 '-'
             airlines(string): 可选航司白名单，逗号分隔，如国航,东航或CA,MU，不限填 '-'
+            allow_stopovers(boolean): 默认 false；仅用户明确接受经停时传 true，不可根据直飞无结果自行设 true
+            allow_connections(boolean): 默认 false；仅用户明确接受换乘中转时传 true，不可根据直飞无结果自行设 true
         """
         try:
             dep_codes = resolve_airports(dep_city)
@@ -267,24 +307,118 @@ class JipiaoPlugin(Star):
                 return "出发地和到达地不能包含相同机场。"
             window = validate_time_window(time_window)
             norm_airlines = normalize_airlines(airlines)
-            flights = await self.scheduler.fetcher(dep_city, arr_city, flight_date)
-            if not flights:
-                return f"未查询到 {flight_date} 从 {dep_city} 到 {arr_city} 的有效直飞航班报价。"
-            best = filter_and_get_lowest(flights, window, norm_airlines)
-            if not best:
-                return f"在 {flight_date} 从 {dep_city} 到 {arr_city} 查到 {len(flights)} 趟直飞航班，但无符合时段({time_window})/航司({airlines})筛选条件的航班。"
+
+            fallback_kind = None
+            if not allow_stopovers and not allow_connections:
+                # Step 1: Query direct only
+                flights = await self.scheduler.fetcher(
+                    dep_city, arr_city, flight_date, allow_stopovers=False, allow_connections=False
+                )
+                best = filter_and_get_lowest(flights, window, norm_airlines)
+
+                # Step 2: Fallback to stopovers
+                if not best:
+                    stopover_flights = await self.scheduler.fetcher(
+                        dep_city,
+                        arr_city,
+                        flight_date,
+                        allow_stopovers=True,
+                        allow_connections=False,
+                    )
+                    stopover_candidates = [
+                        f
+                        for f in stopover_flights
+                        if f.get("itinerary_type") == "stopover"
+                        or (
+                            f.get("itinerary_type") is None
+                            and f.get("stops", 0) > 0
+                            and all(
+                                layover.get("kind") == "same_flight_number"
+                                for layover in f.get("layovers", [])
+                            )
+                        )
+                    ]
+                    best = filter_and_get_lowest(stopover_candidates, window, norm_airlines)
+                    if best:
+                        fallback_kind = "stopover"
+                        flights = stopover_candidates
+
+                # Step 3: Fallback to connections
+                if not best:
+                    conn_flights = await self.scheduler.fetcher(
+                        dep_city,
+                        arr_city,
+                        flight_date,
+                        allow_stopovers=False,
+                        allow_connections=True,
+                    )
+                    conn_candidates = [
+                        f
+                        for f in conn_flights
+                        if f.get("itinerary_type") == "connection"
+                        or (
+                            f.get("itinerary_type") is None
+                            and f.get("stops", 0) > 0
+                            and any(
+                                layover.get("kind") != "same_flight_number"
+                                for layover in f.get("layovers", [])
+                            )
+                        )
+                    ]
+                    best = filter_and_get_lowest(conn_candidates, window, norm_airlines)
+                    if best:
+                        fallback_kind = "connection"
+                        flights = conn_candidates
+
+                if not best:
+                    return (
+                        f"未查到 {flight_date} 从 {dep_city} 到 {arr_city} 符合时段({time_window})/航司({airlines})的有效报价，"
+                        "已查询直飞、经停及中转；不会因此自动开启经停或中转监控。"
+                    )
+            else:
+                # Explicit stop policy from user
+                flights = await self.scheduler.fetcher(
+                    dep_city,
+                    arr_city,
+                    flight_date,
+                    allow_stopovers=allow_stopovers,
+                    allow_connections=allow_connections,
+                )
+                best = filter_and_get_lowest(flights, window, norm_airlines)
+                if not best:
+                    scope_label = describe_scope(allow_stopovers, allow_connections)
+                    return (
+                        f"未查到 {flight_date} 从 {dep_city} 到 {arr_city} 符合时段({time_window})/航司({airlines})的有效报价，"
+                        f"已查询{scope_label}；不会因此自动开启其他范围监控。"
+                    )
+
+            matched = [f for f in flights if filter_and_get_lowest([f], window, norm_airlines)]
+            matched.sort(key=lambda f: f["price"])
+
+            if fallback_kind == "stopover":
+                scope_note = "未查到符合条件的直飞报价，以下为同航班号经停备选；监控仍默认仅直飞，明确说接受经停才会纳入。"
+            elif fallback_kind == "connection":
+                scope_note = "未查到符合条件的直飞或经停报价，以下为换乘中转备选；监控仍默认仅直飞，明确说接受中转才会纳入。"
+            elif allow_stopovers or allow_connections:
+                scope_note = f"查询范围：{describe_scope(allow_stopovers, allow_connections)}（用户已接受）。"
+            else:
+                scope_note = "查询范围：仅直飞。"
 
             lines = [
                 f"【机票实时查询结果】{dep_city} -> {arr_city} | 日期: {flight_date}",
-                f"符合条件最低价: ¥{best['price']} ({best['flight_no']} {best['airline']}, 起降 {best['dep_time']}-{best['arr_time']})",
-                f"共查询到 {len(flights)} 趟直飞航班，以下为前 5 趟可选航班列表：",
+                scope_note,
+                f"符合条件最低价: ¥{best['price']} ({best['flight_no']} {best['airline']}, 起飞 {best['dep_time']}，到达 {best['arr_date']} {best['arr_time']})",
+                describe_itinerary(best),
+                f"共查询到 {len(flights)} 条行程报价，符合筛选 {len(matched)} 条，以下为最便宜的前 5 条：",
             ]
-            for i, f in enumerate(flights[:5], 1):
+            for i, f in enumerate(matched[:5], 1):
                 lines.append(
-                    f"{i}. {f['flight_no']} ({f['airline']}) {f['dep_time']}->{f['arr_time']} 票价: ¥{f['price']}"
+                    f"{i}. {f['flight_no']} ({f['airline']}) 起飞 {f['dep_time']}，到达 {f['arr_date']} {f['arr_time']} 整程票价: ¥{f['price']}\n"
+                    + describe_itinerary(f)
                 )
             lines.append(
-                "注：以上为单程成人经济舱直飞人民币报价，实际票价及税费以官方订票渠道为准。"
+                "注：以上为单程成人经济舱人民币报价；经停/中转行程可能跨境或过夜。"
+                "航司白名单适用于全部航段的营销航司；实际票价、税费及出入境要求以订票渠道为准。"
             )
             return "\n".join(lines)
         except Exception as exc:
@@ -299,24 +433,43 @@ class JipiaoPlugin(Star):
         flight_date: str,
         time_window: str = "-",
         airlines: str = "-",
-        target_price: str = "-",
+        target_price: int | None = None,
+        allow_stopovers: bool = False,
+        allow_connections: bool = False,
     ) -> str:
-        """为当前用户开启机票低价监控任务。当用户希望监控某航线低价或降至目标价时提醒时调用。
+        """开启或修改当前用户的机票低价监控任务。出发日北京时间零点自动结束，降价主动推送提醒。
 
         Args:
-            dep_city(string): 出发城市或机场三字码，例如北京、PEK
-            arr_city(string): 到达城市或机场三字码，例如上海、SHA
-            flight_date(string): 起飞日期，严格格式为 YYYY-MM-DD，必须晚于今天
-            time_window(string): 可选起飞时段范围，格式为 HH:MM-HH:MM，不限填 '-'
+            dep_city(string): 出发城市名称或机场三字码，例如北京、上海、PEK
+            arr_city(string): 到达城市名称或机场三字码，例如广州、深圳、SHA
+            flight_date(string): 出发日期，格式必须为 YYYY-MM-DD，必须晚于今天，例如 2026-11-25
+            time_window(string): 可选出发时段，格式为 HH:MM-HH:MM，不限填 '-'
             airlines(string): 可选航司白名单，逗号分隔，如国航,东航或CA,MU，不限填 '-'
-            target_price(string): 可选目标价（正整数人民币元），未设置填 '-' 则启用37%观察策略
+            target_price(number): 可选目标价格（人民币正整数）；不设置时传 null，自动启用 37% 观察策略
+            allow_stopovers(boolean): 默认 false；只有用户明确接受同航班号经停时才传 true
+            allow_connections(boolean): 默认 false；只有用户明确接受换乘中转时才传 true
         """
+        if allow_stopovers and allow_connections:
+            stop_policy = "接受经停与中转"
+        elif allow_stopovers:
+            stop_policy = "接受经停"
+        elif allow_connections:
+            stop_policy = "接受中转"
+        else:
+            stop_policy = "直飞"
+
         target_str = str(target_price).strip() if target_price is not None else "-"
         if target_str in {"", "0", "None", "null"}:
             target_str = "-"
         try:
             settings = validate_settings(
-                dep_city, arr_city, flight_date, time_window, airlines, target_str
+                dep_city,
+                arr_city,
+                flight_date,
+                time_window,
+                airlines,
+                target_str,
+                stop_policy,
             )
         except Exception as exc:
             return f"设置监控任务失败: {exc}"
@@ -332,12 +485,20 @@ class JipiaoPlugin(Star):
         self.scheduler.wake()
         target = settings["target_price"]
         mode_desc = f"目标价模式(≤ ¥{target})" if target is not None else "37%观察策略模式"
+        scope_text = describe_scope(settings["allow_stopovers"], settings["allow_connections"])
+        scope_detail = (
+            f"{scope_text}（无结果不自动放宽范围）"
+            if (settings["allow_stopovers"] or settings["allow_connections"])
+            else "仅直飞，无结果不自动改为经停或中转"
+        )
         return (
             f"已成功开启机票低价监控{'（已覆盖原有监控任务）' if existed else ''}：\n"
             f"航线：{settings['dep_city']} → {settings['arr_city']}，出发日期：{flight_date}。\n"
             f"筛选条件：起飞时段 {settings['time_window'] or '不限'}，航司 {settings['airlines'] or '不限'}。\n"
             f"监控模式：{mode_desc}。\n"
-            f"系统将在后台自动轮询，并在满足降价条件时主动推送消息提醒。出发日北京时间零点自动结束。"
+            f"航程类型：{scope_detail}。\n"
+            "单程成人经济舱；航司白名单适用于全部航段。\n"
+            "系统将在后台自动轮询，并在满足降价条件时主动推送消息提醒。出发日北京时间零点自动结束。"
         )
 
     @filter.llm_tool(name="get_flight_monitor")
@@ -356,10 +517,12 @@ class JipiaoPlugin(Star):
             else "尚未查询"
         )
         best = json.loads(task["last_best_json"]) if task["last_best_json"] else None
+        scope_text = describe_scope(bool(task["allow_stopovers"]), bool(task["allow_connections"]))
         lines = [
             "【您的机票监控任务详情】",
             f"航线: {task['dep_city']} → {task['arr_city']} | 出发日期: {task['flight_date']}",
             f"筛选条件: 时段 {task['time_window'] or '不限'} | 航司 {task['airlines'] or '不限'}",
+            f"航程类型: {scope_text}",
             f"目标价: {'¥' + str(task['target_price']) if task['target_price'] is not None else '未设置(启用37%观察策略)'}",
             f"当前阶段: {phase}",
             f"观察期已记录低价: {recorded}",

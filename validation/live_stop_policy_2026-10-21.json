@@ -1,0 +1,806 @@
+{
+  "checked_at": "2026-10-21T19:22:03.086608+08:00",
+  "route": [
+    "北京",
+    "上海"
+  ],
+  "date": "2026-12-01",
+  "queries": {
+    "False": [
+      {
+        "flight_no": "CZ8879",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "09:00",
+        "arr_time": "11:10",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8879",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T09:00:00",
+            "arr_datetime": "2026-12-01T11:10:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8885",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "13:00",
+        "arr_time": "15:05",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 125,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8885",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T13:00:00",
+            "arr_datetime": "2026-12-01T15:05:00",
+            "duration_minutes": 125
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8887",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "16:20",
+        "arr_time": "18:35",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 135,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8887",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T16:20:00",
+            "arr_datetime": "2026-12-01T18:35:00",
+            "duration_minutes": 135
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ5663",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "19:45",
+        "arr_time": "21:50",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 125,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ5663",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T19:45:00",
+            "arr_datetime": "2026-12-01T21:50:00",
+            "duration_minutes": 125
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8889",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "20:30",
+        "arr_time": "22:50",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "PVG",
+        "duration_minutes": 140,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8889",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-01T20:30:00",
+            "arr_datetime": "2026-12-01T22:50:00",
+            "duration_minutes": 140
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7601",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "07:25",
+        "arr_time": "09:35",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7601",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T07:25:00",
+            "arr_datetime": "2026-12-01T09:35:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7603",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "08:25",
+        "arr_time": "10:35",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7603",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T08:25:00",
+            "arr_datetime": "2026-12-01T10:35:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7613",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "10:55",
+        "arr_time": "13:20",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "PVG",
+        "duration_minutes": 145,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7613",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-01T10:55:00",
+            "arr_datetime": "2026-12-01T13:20:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7611",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "15:55",
+        "arr_time": "18:20",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "PVG",
+        "duration_minutes": 145,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7611",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-01T15:55:00",
+            "arr_datetime": "2026-12-01T18:20:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7605",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "16:00",
+        "arr_time": "18:10",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7605",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T16:00:00",
+            "arr_datetime": "2026-12-01T18:10:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7607",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "17:30",
+        "arr_time": "19:40",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7607",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T17:30:00",
+            "arr_datetime": "2026-12-01T19:40:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7609",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "20:15",
+        "arr_time": "22:40",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 145,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7609",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T20:15:00",
+            "arr_datetime": "2026-12-01T22:40:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      }
+    ],
+    "True": [
+      {
+        "flight_no": "KE2224 / KE2071",
+        "airline": "Korean Air",
+        "airline_code": "KE",
+        "dep_time": "10:25",
+        "arr_time": "09:40",
+        "arr_date": "2026-12-02",
+        "dep_airport": "PEK",
+        "arr_airport": "PVG",
+        "duration_minutes": 1395,
+        "stops": 1,
+        "legs": [
+          {
+            "flight_no": "KE2224",
+            "airline": "Korean Air",
+            "airline_code": "KE",
+            "dep_airport": "PEK",
+            "arr_airport": "PUS",
+            "dep_datetime": "2026-12-01T10:25:00",
+            "arr_datetime": "2026-12-01T14:05:00",
+            "duration_minutes": 160
+          },
+          {
+            "flight_no": "KE2071",
+            "airline": "Korean Air",
+            "airline_code": "KE",
+            "dep_airport": "PUS",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-02T08:35:00",
+            "arr_datetime": "2026-12-02T09:40:00",
+            "duration_minutes": 125
+          }
+        ],
+        "layovers": [
+          {
+            "arrival_airport": "PUS",
+            "departure_airport": "PUS",
+            "duration_minutes": 1110,
+            "overnight": true,
+            "change_of_airport": false,
+            "kind": "connection"
+          }
+        ],
+        "self_transfer": null,
+        "price": 1718,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8879",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "09:00",
+        "arr_time": "11:10",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8879",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T09:00:00",
+            "arr_datetime": "2026-12-01T11:10:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8885",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "13:00",
+        "arr_time": "15:05",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 125,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8885",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T13:00:00",
+            "arr_datetime": "2026-12-01T15:05:00",
+            "duration_minutes": 125
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8887",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "16:20",
+        "arr_time": "18:35",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 135,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8887",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T16:20:00",
+            "arr_datetime": "2026-12-01T18:35:00",
+            "duration_minutes": 135
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ5663",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "19:45",
+        "arr_time": "21:50",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "SHA",
+        "duration_minutes": 125,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ5663",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T19:45:00",
+            "arr_datetime": "2026-12-01T21:50:00",
+            "duration_minutes": 125
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "CZ8889",
+        "airline": "China Southern Airlines",
+        "airline_code": "CZ",
+        "dep_time": "20:30",
+        "arr_time": "22:50",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PKX",
+        "arr_airport": "PVG",
+        "duration_minutes": 140,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "CZ8889",
+            "airline": "China Southern Airlines",
+            "airline_code": "CZ",
+            "dep_airport": "PKX",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-01T20:30:00",
+            "arr_datetime": "2026-12-01T22:50:00",
+            "duration_minutes": 140
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 1770,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "NX7 / NX112",
+        "airline": "Air Macau",
+        "airline_code": "NX",
+        "dep_time": "16:10",
+        "arr_time": "12:50",
+        "arr_date": "2026-12-02",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 1240,
+        "stops": 1,
+        "legs": [
+          {
+            "flight_no": "NX7",
+            "airline": "Air Macau",
+            "airline_code": "NX",
+            "dep_airport": "PEK",
+            "arr_airport": "MFM",
+            "dep_datetime": "2026-12-01T16:10:00",
+            "arr_datetime": "2026-12-01T19:50:00",
+            "duration_minutes": 220
+          },
+          {
+            "flight_no": "NX112",
+            "airline": "Air Macau",
+            "airline_code": "NX",
+            "dep_airport": "MFM",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-02T10:25:00",
+            "arr_datetime": "2026-12-02T12:50:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [
+          {
+            "arrival_airport": "MFM",
+            "departure_airport": "MFM",
+            "duration_minutes": 875,
+            "overnight": true,
+            "change_of_airport": false,
+            "kind": "connection"
+          }
+        ],
+        "self_transfer": null,
+        "price": 1805,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7601",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "07:25",
+        "arr_time": "09:35",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7601",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T07:25:00",
+            "arr_datetime": "2026-12-01T09:35:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7603",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "08:25",
+        "arr_time": "10:35",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7603",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T08:25:00",
+            "arr_datetime": "2026-12-01T10:35:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7613",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "10:55",
+        "arr_time": "13:20",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "PVG",
+        "duration_minutes": 145,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7613",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-01T10:55:00",
+            "arr_datetime": "2026-12-01T13:20:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7611",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "15:55",
+        "arr_time": "18:20",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "PVG",
+        "duration_minutes": 145,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7611",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "PVG",
+            "dep_datetime": "2026-12-01T15:55:00",
+            "arr_datetime": "2026-12-01T18:20:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7605",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "16:00",
+        "arr_time": "18:10",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7605",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T16:00:00",
+            "arr_datetime": "2026-12-01T18:10:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7607",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "17:30",
+        "arr_time": "19:40",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 130,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7607",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T17:30:00",
+            "arr_datetime": "2026-12-01T19:40:00",
+            "duration_minutes": 130
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      },
+      {
+        "flight_no": "HU7609",
+        "airline": "Hainan Airlines",
+        "airline_code": "HU",
+        "dep_time": "20:15",
+        "arr_time": "22:40",
+        "arr_date": "2026-12-01",
+        "dep_airport": "PEK",
+        "arr_airport": "SHA",
+        "duration_minutes": 145,
+        "stops": 0,
+        "legs": [
+          {
+            "flight_no": "HU7609",
+            "airline": "Hainan Airlines",
+            "airline_code": "HU",
+            "dep_airport": "PEK",
+            "arr_airport": "SHA",
+            "dep_datetime": "2026-12-01T20:15:00",
+            "arr_datetime": "2026-12-01T22:40:00",
+            "duration_minutes": 145
+          }
+        ],
+        "layovers": [],
+        "self_transfer": null,
+        "price": 2510,
+        "currency": "CNY",
+        "source": "Google Flights / fli"
+      }
+    ]
+  }
+}

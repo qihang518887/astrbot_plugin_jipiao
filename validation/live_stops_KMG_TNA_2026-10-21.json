@@ -1,0 +1,212 @@
+{
+  "checked_at": "2026-10-21T19:06:40.652769+08:00",
+  "departure": "KMG",
+  "arrival": "TNA",
+  "date": "2026-11-05",
+  "queries": {
+    "NON_STOP": [
+      {
+        "legs": [
+          {
+            "airline": "Kunming Airlines",
+            "flight_number": "8201",
+            "departure_airport": "Kunming Wujiaba International Airport",
+            "arrival_airport": "Yaoqiang Airport",
+            "departure_datetime": "2026-11-05T09:10:00",
+            "arrival_datetime": "2026-11-05T12:15:00",
+            "duration": 185,
+            "departure_airport_name": "昆明长水国际机场",
+            "arrival_airport_name": "济南遥墙国际机场",
+            "operating_airline": null,
+            "operating_flight_number": null,
+            "aircraft": "Boeing 737",
+            "legroom": "76厘米",
+            "legroom_short": "76厘米",
+            "amenities": {
+              "wifi": null,
+              "power": null,
+              "usb_power": null,
+              "in_seat_video": null,
+              "on_demand_video": null,
+              "legroom_rating": 1,
+              "wifi_tier": null,
+              "power_type": null,
+              "video_type": null,
+              "seat_quality": "average",
+              "legroom_inches": null
+            },
+            "overnight": false,
+            "co2_emissions_g": 163033,
+            "cabin": 1
+          }
+        ],
+        "price": null,
+        "currency": null,
+        "duration": 185,
+        "stops": 0,
+        "layovers": null,
+        "co2_emissions_g": 163000,
+        "co2_emissions_typical_g": 190000,
+        "co2_emissions_delta_pct": -14,
+        "emissions_tag": "typical",
+        "self_transfer": null,
+        "mixed_cabin": null,
+        "primary_airline": "Kunming Airlines",
+        "primary_airline_name": "昆航",
+        "booking_token": "[\"CAASABoCCAAicwpdClsKA0tNRxIZMjAyNi0xMS0wNVQwOToxMDowMCswODowMBoDVE5BIhkyMDI2LTExLTA1VDEyOjE1OjAwKzA4OjAwKgJLWTIEODIwMToCS1lCBDgyMDFIAVIDNzM4EgQIAxABGAEoADIICgbmmIboiKoqBkNocm9tZQ\\u003d\\u003d\"]"
+      },
+      {
+        "legs": [
+          {
+            "airline": "Kunming Airlines",
+            "flight_number": "8203",
+            "departure_airport": "Kunming Wujiaba International Airport",
+            "arrival_airport": "Yaoqiang Airport",
+            "departure_datetime": "2026-11-05T13:55:00",
+            "arrival_datetime": "2026-11-05T16:55:00",
+            "duration": 180,
+            "departure_airport_name": "昆明长水国际机场",
+            "arrival_airport_name": "济南遥墙国际机场",
+            "operating_airline": null,
+            "operating_flight_number": null,
+            "aircraft": "Boeing 737",
+            "legroom": "76厘米",
+            "legroom_short": "76厘米",
+            "amenities": {
+              "wifi": null,
+              "power": null,
+              "usb_power": null,
+              "in_seat_video": null,
+              "on_demand_video": null,
+              "legroom_rating": 1,
+              "wifi_tier": null,
+              "power_type": null,
+              "video_type": null,
+              "seat_quality": "average",
+              "legroom_inches": null
+            },
+            "overnight": false,
+            "co2_emissions_g": 163033,
+            "cabin": 1
+          }
+        ],
+        "price": null,
+        "currency": null,
+        "duration": 180,
+        "stops": 0,
+        "layovers": null,
+        "co2_emissions_g": 163000,
+        "co2_emissions_typical_g": 190000,
+        "co2_emissions_delta_pct": -14,
+        "emissions_tag": "typical",
+        "self_transfer": null,
+        "mixed_cabin": null,
+        "primary_airline": "Kunming Airlines",
+        "primary_airline_name": "昆航",
+        "booking_token": "[\"CAASABoCCAAicwpdClsKA0tNRxIZMjAyNi0xMS0wNVQxMzo1NTowMCswODowMBoDVE5BIhkyMDI2LTExLTA1VDE2OjU1OjAwKzA4OjAwKgJLWTIEODIwMzoCS1lCBDgyMDNIAVIDNzM4EgQIAxABGAEoADIICgbmmIboiKoqBkNocm9tZQ\\u003d\\u003d\"]"
+      }
+    ],
+    "ANY": [
+      {
+        "legs": [
+          {
+            "airline": "Kunming Airlines",
+            "flight_number": "8201",
+            "departure_airport": "Kunming Wujiaba International Airport",
+            "arrival_airport": "Yaoqiang Airport",
+            "departure_datetime": "2026-11-05T09:10:00",
+            "arrival_datetime": "2026-11-05T12:15:00",
+            "duration": 185,
+            "departure_airport_name": "昆明长水国际机场",
+            "arrival_airport_name": "济南遥墙国际机场",
+            "operating_airline": null,
+            "operating_flight_number": null,
+            "aircraft": "Boeing 737",
+            "legroom": "76厘米",
+            "legroom_short": "76厘米",
+            "amenities": {
+              "wifi": null,
+              "power": null,
+              "usb_power": null,
+              "in_seat_video": null,
+              "on_demand_video": null,
+              "legroom_rating": 1,
+              "wifi_tier": null,
+              "power_type": null,
+              "video_type": null,
+              "seat_quality": "average",
+              "legroom_inches": null
+            },
+            "overnight": false,
+            "co2_emissions_g": 163033,
+            "cabin": 1
+          }
+        ],
+        "price": null,
+        "currency": null,
+        "duration": 185,
+        "stops": 0,
+        "layovers": null,
+        "co2_emissions_g": 163000,
+        "co2_emissions_typical_g": 190000,
+        "co2_emissions_delta_pct": -14,
+        "emissions_tag": "typical",
+        "self_transfer": null,
+        "mixed_cabin": null,
+        "primary_airline": "Kunming Airlines",
+        "primary_airline_name": "昆航",
+        "booking_token": "[\"CAASABoCCAAicwpdClsKA0tNRxIZMjAyNi0xMS0wNVQwOToxMDowMCswODowMBoDVE5BIhkyMDI2LTExLTA1VDEyOjE1OjAwKzA4OjAwKgJLWTIEODIwMToCS1lCBDgyMDFIAVIDNzM4EgQIAxABGAEoADIICgbmmIboiKoqBkNocm9tZQ\\u003d\\u003d\"]"
+      },
+      {
+        "legs": [
+          {
+            "airline": "Kunming Airlines",
+            "flight_number": "8203",
+            "departure_airport": "Kunming Wujiaba International Airport",
+            "arrival_airport": "Yaoqiang Airport",
+            "departure_datetime": "2026-11-05T13:55:00",
+            "arrival_datetime": "2026-11-05T16:55:00",
+            "duration": 180,
+            "departure_airport_name": "昆明长水国际机场",
+            "arrival_airport_name": "济南遥墙国际机场",
+            "operating_airline": null,
+            "operating_flight_number": null,
+            "aircraft": "Boeing 737",
+            "legroom": "76厘米",
+            "legroom_short": "76厘米",
+            "amenities": {
+              "wifi": null,
+              "power": null,
+              "usb_power": null,
+              "in_seat_video": null,
+              "on_demand_video": null,
+              "legroom_rating": 1,
+              "wifi_tier": null,
+              "power_type": null,
+              "video_type": null,
+              "seat_quality": "average",
+              "legroom_inches": null
+            },
+            "overnight": false,
+            "co2_emissions_g": 163033,
+            "cabin": 1
+          }
+        ],
+        "price": null,
+        "currency": null,
+        "duration": 180,
+        "stops": 0,
+        "layovers": null,
+        "co2_emissions_g": 163000,
+        "co2_emissions_typical_g": 190000,
+        "co2_emissions_delta_pct": -14,
+        "emissions_tag": "typical",
+        "self_transfer": null,
+        "mixed_cabin": null,
+        "primary_airline": "Kunming Airlines",
+        "primary_airline_name": "昆航",
+        "booking_token": "[\"CAASABoCCAAicwpdClsKA0tNRxIZMjAyNi0xMS0wNVQxMzo1NTowMCswODowMBoDVE5BIhkyMDI2LTExLTA1VDE2OjU1OjAwKzA4OjAwKgJLWTIEODIwMzoCS1lCBDgyMDNIAVIDNzM4EgQIAxABGAEoADIICgbmmIboiKoqBkNocm9tZQ\\u003d\\u003d\"]"
+      }
+    ]
+  }
+}

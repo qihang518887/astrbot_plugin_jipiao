@@ -7,7 +7,7 @@ import random
 import time
 
 from .algorithm import evaluate_flight, flight_timestamp, task_phase
-from .fetcher import fetch_raw_flights, filter_and_get_lowest
+from .fetcher import describe_itinerary, fetch_raw_flights, filter_and_get_lowest
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +112,13 @@ class MonitorScheduler:
 
         # No lock is held during I/O, so users can replace or cancel immediately.
         try:
-            flights = await self.fetcher(task["dep_city"], task["arr_city"], task["flight_date"])
+            flights = await self.fetcher(
+                task["dep_city"],
+                task["arr_city"],
+                task["flight_date"],
+                allow_stopovers=bool(task["allow_stopovers"]),
+                allow_connections=bool(task["allow_connections"]),
+            )
             best = filter_and_get_lowest(flights, task["time_window"], task["airlines"])
         except Exception as exc:
             logger.exception("Flight data query failed")
@@ -150,10 +156,11 @@ class MonitorScheduler:
                 f"{prefix}\n{task['dep_city']} → {task['arr_city']}｜{task['flight_date']}\n"
                 f"{best['flight_no']} {best['airline']}\n"
                 f"起飞 {best['dep_time']} → 到达 {best.get('arr_date', task['flight_date'])} {best['arr_time']}\n"
+                f"{describe_itinerary(best)}\n"
                 f"本次匹配最低价：¥{best['price']} / 成人\n"
                 f"{decision['notify_reason']}\n"
                 f"数据来源：{best.get('source', 'Google Flights / fli')}\n"
-                "单程经济舱直飞；报价向上取整，仅供参考，实际价格和税费以购票页面为准。\n"
+                "单程经济舱；报价向上取整，实际价格和税费以购票页面为准。\n"
                 "仅价格进一步降低时再次提醒；/取消监控 可停止。"
             )
             try:

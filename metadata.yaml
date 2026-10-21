@@ -1,7 +1,7 @@
 name: astrbot_plugin_jipiao
 display_name: 机票低价监控
-desc: 单程直飞机票监控，支持目标价、观察策略及 QQ 主动提醒。
-version: v0.2.1
+desc: fli 单程机票监控，默认直飞，经停需明确接受；支持目标价、观察策略及 QQ 提醒。
+version: v0.3.3
 author: qihang518887
 astrbot_version: ">=4.29.1"
 repo: https://github.com/qihang518887/astrbot_plugin_jipiao

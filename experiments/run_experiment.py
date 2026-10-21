@@ -46,7 +46,7 @@ async def experiment_1_search():
 
     try:
         flights = await fetch_raw_flights(dep_city, arr_city, target_date)
-        print(f"[✓] 搜寻成功！获取到 {len(flights)} 趟有效直飞航班数据：")
+        print(f"[✓] 搜寻成功！获取到 {len(flights)} 条有效直飞行程报价：")
         for i, f in enumerate(flights[:5], 1):
             print(
                 f"   {i}. 航班: {f['flight_no']} ({f['airline']}) | 起降: {f['dep_time']} -> {f['arr_time']} | 票价: ¥{f['price']} {f['currency']}"

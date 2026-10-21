@@ -26,6 +26,8 @@ class FlightDB:
                 time_window TEXT DEFAULT NULL,
                 airlines TEXT DEFAULT NULL,
                 target_price INTEGER DEFAULT NULL,
+                allow_stopovers INTEGER NOT NULL DEFAULT 0,
+                allow_connections INTEGER NOT NULL DEFAULT 0,
                 created_at INTEGER NOT NULL,
                 lowest_3_json TEXT DEFAULT '[]',
                 last_pushed_price INTEGER DEFAULT NULL,
@@ -35,16 +37,32 @@ class FlightDB:
                 last_best_json TEXT DEFAULT NULL
             )
         """)
-        # Accept databases created with the original eleven-column proposal.
+        # Add task settings to existing installations as the schema evolves.
         columns = {row[1] for row in self.conn.execute("PRAGMA table_info(tasks)")}
         for name, sql_type in {
             "revision": "TEXT NOT NULL DEFAULT ''",
             "last_checked_at": "INTEGER DEFAULT NULL",
             "last_status": "TEXT DEFAULT NULL",
             "last_best_json": "TEXT DEFAULT NULL",
+            "allow_stopovers": "INTEGER NOT NULL DEFAULT 0",
+            "allow_connections": "INTEGER NOT NULL DEFAULT 0",
         }.items():
             if name not in columns:
                 self.conn.execute(f"ALTER TABLE tasks ADD COLUMN {name} {sql_type}")
+        if "allow_stopovers" not in columns:
+            # Earlier '接受经停' also allowed flight changes. Preserve the user's
+            # stopover choice, disable connections, and discard the mixed baseline.
+            if "allow_stops" in columns:
+                self.conn.execute("UPDATE tasks SET allow_stopovers=allow_stops")
+            reset_where = "WHERE allow_stops=1" if "allow_stops" in columns else ""
+            self.conn.execute(
+                """UPDATE tasks SET lowest_3_json='[]', last_pushed_price=NULL,
+                last_best_json=NULL, last_checked_at=NULL,
+                last_status='已分开经停与中转，按新范围重新观察',
+                created_at=?, revision=lower(hex(randomblob(16))) """
+                + reset_where,
+                (int(time.time()),),
+            )
         self.conn.commit()
 
     def upsert_task(
@@ -57,13 +75,16 @@ class FlightDB:
         time_window=None,
         airlines=None,
         target_price=None,
+        allow_stopovers=False,
+        allow_connections=False,
     ):
         with self.conn:
             self.conn.execute(
                 """INSERT OR REPLACE INTO tasks
                 (user_id, session_id, dep_city, arr_city, flight_date,
-                 time_window, airlines, target_price, created_at, revision)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                 time_window, airlines, target_price, allow_stopovers, allow_connections,
+                 created_at, revision)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     user_id,
                     session_id,
@@ -73,6 +94,8 @@ class FlightDB:
                     time_window,
                     airlines,
                     target_price,
+                    int(allow_stopovers),
+                    int(allow_connections),
                     int(time.time()),
                     uuid.uuid4().hex,
                 ),

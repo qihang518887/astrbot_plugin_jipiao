@@ -31,11 +31,23 @@ async def main():
     parser.add_argument("--time-window", default=None)
     parser.add_argument("--airlines", default=None)
     parser.add_argument("--mock", action="store_true", help="使用明确标注的模拟报价")
+    parser.add_argument("--allow-stopovers", action="store_true", help="允许经停，默认仅直飞")
+    parser.add_argument("--allow-connections", action="store_true", help="允许中转，默认仅直飞")
+    parser.add_argument("--allow-stops", action="store_true", help="允许经停与中转，默认仅直飞")
     args = parser.parse_args()
     window = validate_time_window(args.time_window)
     airlines = normalize_airlines(args.airlines)
     fetcher = fetch_mock_flights if args.mock else fetch_raw_flights
-    flights = await fetcher(args.dep, args.arr, args.date)
+    if args.allow_stops:
+        args.allow_stopovers = True
+        args.allow_connections = True
+    flights = await fetcher(
+        args.dep,
+        args.arr,
+        args.date,
+        allow_stopovers=args.allow_stopovers,
+        allow_connections=args.allow_connections,
+    )
     print(
         json.dumps(
             {
@@ -44,6 +56,8 @@ async def main():
                 "date": args.date,
                 "checked_at": datetime.now(CHINA_TZ).isoformat(),
                 "returned_count": len(flights),
+                "allow_stopovers": args.allow_stopovers,
+                "allow_connections": args.allow_connections,
                 "best": filter_and_get_lowest(flights, window, airlines),
                 "note": "模拟数据，不可购票"
                 if args.mock

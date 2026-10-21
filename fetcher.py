@@ -137,7 +137,13 @@ def validate_time_window(value: str | None) -> str | None:
     return value
 
 
-def _fetch_sync(dep_city: str, arr_city: str, flight_date: str) -> list[dict]:
+def _fetch_sync(
+    dep_city: str,
+    arr_city: str,
+    flight_date: str,
+    allow_stopovers: bool = False,
+    allow_connections: bool = False,
+) -> list[dict]:
     from fli.models import (
         Airport,
         FlightSearchFilters,
@@ -159,7 +165,7 @@ def _fetch_sync(dep_city: str, arr_city: str, flight_date: str) -> list[dict]:
             )
         ],
         seat_type=SeatType.ECONOMY,
-        stops=MaxStops.NON_STOP,
+        stops=MaxStops.ANY if allow_stopovers or allow_connections else MaxStops.NON_STOP,
         sort_by=SortBy.CHEAPEST,
     )
     search = SearchFlights()
@@ -167,27 +173,71 @@ def _fetch_sync(dep_city: str, arr_city: str, flight_date: str) -> list[dict]:
     flights = search.search(filters, currency="CNY", language="zh-CN", country="CN")
     normalized = []
     for flight in flights or []:
-        if len(flight.legs) != 1 or flight.price is None:
+        if not (allow_stopovers or allow_connections) and len(flight.legs) > 1:
+            continue
+        if flight.price is None:
             continue
         if not math.isfinite(flight.price) or flight.price <= 0:
             continue
         if flight.currency and flight.currency.upper() != "CNY":
             continue
-        leg = flight.legs[0]
-        if leg.departure_datetime.strftime("%Y-%m-%d") != flight_date:
+        first, last = flight.legs[0], flight.legs[-1]
+        if first.departure_datetime.strftime("%Y-%m-%d") != flight_date:
             continue
-        code = leg.airline.name.removeprefix("_")
-        number = str(leg.flight_number)
+        legs = []
+        for leg in flight.legs:
+            code = leg.airline.name.removeprefix("_")
+            number = str(leg.flight_number)
+            legs.append(
+                {
+                    "flight_no": number if number.startswith(code) else f"{code}{number}",
+                    "airline": str(leg.airline.value),
+                    "airline_code": code,
+                    "dep_airport": leg.departure_airport.name,
+                    "arr_airport": leg.arrival_airport.name,
+                    "dep_datetime": leg.departure_datetime.isoformat(),
+                    "arr_datetime": leg.arrival_datetime.isoformat(),
+                    "duration_minutes": leg.duration,
+                }
+            )
+        layovers = [
+            {
+                "arrival_airport": previous["arr_airport"],
+                "departure_airport": following["dep_airport"],
+                "duration_minutes": layover.duration,
+                "overnight": layover.overnight,
+                "change_of_airport": layover.change_of_airport,
+                "kind": "same_flight_number"
+                if previous["flight_no"] == following["flight_no"]
+                and not layover.change_of_airport
+                and not flight.self_transfer
+                else "connection",
+            }
+            for previous, following, layover in zip(
+                legs[:-1], legs[1:], flight.layovers or [], strict=True
+            )
+        ]
+        itinerary_type = classify_itinerary(legs, layovers, flight.self_transfer)
+        if itinerary_type == "stopover" and not allow_stopovers:
+            continue
+        if itinerary_type == "connection" and not allow_connections:
+            continue
         normalized.append(
             {
-                "flight_no": number if number.startswith(code) else f"{code}{number}",
-                "airline": str(leg.airline.value),
-                "airline_code": code,
-                "dep_time": leg.departure_datetime.strftime("%H:%M"),
-                "arr_time": leg.arrival_datetime.strftime("%H:%M"),
-                "arr_date": leg.arrival_datetime.strftime("%Y-%m-%d"),
-                "dep_airport": leg.departure_airport.name,
-                "arr_airport": leg.arrival_airport.name,
+                "itinerary_type": itinerary_type,
+                "flight_no": " / ".join(leg["flight_no"] for leg in legs),
+                "airline": " / ".join(dict.fromkeys(leg["airline"] for leg in legs)),
+                "airline_code": ",".join(dict.fromkeys(leg["airline_code"] for leg in legs)),
+                "dep_time": first.departure_datetime.strftime("%H:%M"),
+                "arr_time": last.arrival_datetime.strftime("%H:%M"),
+                "arr_date": last.arrival_datetime.strftime("%Y-%m-%d"),
+                "dep_airport": first.departure_airport.name,
+                "arr_airport": last.arrival_airport.name,
+                "duration_minutes": flight.duration,
+                "stops": len(legs) - 1,
+                "legs": legs,
+                "layovers": layovers,
+                "self_transfer": flight.self_transfer,
                 # Round up so a fractional quote above a whole-yuan target never triggers it.
                 "price": int(Decimal(str(flight.price)).to_integral_value(rounding=ROUND_CEILING)),
                 "currency": "CNY",
@@ -197,18 +247,30 @@ def _fetch_sync(dep_city: str, arr_city: str, flight_date: str) -> list[dict]:
     return normalized
 
 
-async def fetch_raw_flights(dep_city: str, arr_city: str, flight_date: str) -> list[dict]:
+async def fetch_raw_flights(
+    dep_city: str,
+    arr_city: str,
+    flight_date: str,
+    allow_stopovers: bool = False,
+    allow_connections: bool = False,
+) -> list[dict]:
     """Run blocking fli I/O outside the event loop and drain it on cancellation.
 
     Args:
         dep_city: Supported city alias or IATA airport code.
         arr_city: Supported city alias or IATA airport code.
         flight_date: Local departure date in YYYY-MM-DD format.
+        allow_stopovers: Include same-flight-number stopovers when explicitly enabled.
+        allow_connections: Include flight changes when independently enabled.
 
     Returns:
-        Priced nonstop adult economy flights returned by fli.
+        Priced adult economy itineraries matching the requested stop policy.
     """
-    worker = asyncio.create_task(asyncio.to_thread(_fetch_sync, dep_city, arr_city, flight_date))
+    worker = asyncio.create_task(
+        asyncio.to_thread(
+            _fetch_sync, dep_city, arr_city, flight_date, allow_stopovers, allow_connections
+        )
+    )
     try:
         return await asyncio.shield(worker)
     except asyncio.CancelledError:
@@ -220,19 +282,33 @@ async def fetch_raw_flights(dep_city: str, arr_city: str, flight_date: str) -> l
         raise
 
 
-async def fetch_mock_flights(dep_city: str, arr_city: str, flight_date: str) -> list[dict]:
+async def fetch_mock_flights(
+    dep_city: str,
+    arr_city: str,
+    flight_date: str,
+    allow_stopovers: bool = False,
+    allow_connections: bool = False,
+) -> list[dict]:
     seed = hashlib.sha256(
         f"{dep_city}|{arr_city}|{flight_date}|{int(time.time()) // 1800}".encode()
     ).hexdigest()
     rng = random.Random(seed)
     return [
         {
+            "itinerary_type": "nonstop",
             "flight_no": f"{code}{5100 + i}",
             "airline": name,
             "airline_code": code,
             "dep_time": f"{8 + i * 2:02d}:30",
             "arr_time": f"{10 + i * 2:02d}:30",
             "arr_date": flight_date,
+            "dep_airport": resolve_airports(dep_city)[0],
+            "arr_airport": resolve_airports(arr_city)[0],
+            "duration_minutes": 120,
+            "stops": 0,
+            "legs": [],
+            "layovers": [],
+            "self_transfer": False,
             "price": rng.randint(350, 950),
             "currency": "CNY",
             "source": "模拟数据（不可购票）",
@@ -265,8 +341,62 @@ def filter_and_get_lowest(
             if not start <= flight["dep_time"] <= end:
                 continue
         if keywords:
-            code = flight.get("airline_code", flight["flight_no"][:2]).upper()
-            if not any(k == code or k in flight["airline"].upper() for k in keywords):
+            codes = flight.get("airline_code", flight["flight_no"][:2]).upper().split(",")
+            if not all(code in keywords for code in codes):
                 continue
         valid.append(flight)
     return min(valid, key=lambda flight: flight["price"]) if valid else None
+
+
+def classify_itinerary(legs: list[dict], layovers: list[dict], self_transfer: bool | None) -> str:
+    """Classify decoded segments; a same flight number does not prove the same aircraft."""
+    if len(legs) == 1:
+        return "nonstop"
+    if (
+        not self_transfer
+        and all(leg["flight_no"] == legs[0]["flight_no"] for leg in legs)
+        and not any(stop["change_of_airport"] for stop in layovers)
+    ):
+        return "stopover"
+    return "connection"
+
+
+def describe_scope(allow_stopovers: bool, allow_connections: bool) -> str:
+    types = ["直飞"]
+    if allow_stopovers:
+        types.append("经停")
+    if allow_connections:
+        types.append("中转")
+    return "、".join(types) if len(types) > 1 else "仅直飞"
+
+
+def describe_itinerary(flight: dict) -> str:
+    parts = ["%s → %s" % (flight["dep_airport"], flight["arr_airport"])]
+    itype = flight.get("itinerary_type")
+    if itype is None:
+        itype = "nonstop" if flight.get("stops", 0) == 0 else "connection"
+    if itype == "nonstop":
+        parts.append("直飞（接口单航段）")
+    else:
+        parts.append(
+            ("同航班号经停 %s 次（是否换机待核实）" % flight.get("stops", 0))
+            if itype == "stopover"
+            else ("中转行程（换航班），共 %s 次停靠" % flight.get("stops", 0))
+        )
+        for stop in flight.get("layovers", []):
+            airport = stop.get("arrival_airport", "")
+            if stop.get("change_of_airport"):
+                airport += " → %s（需换机场）" % stop.get("departure_airport", "")
+            kind = (
+                "同航班号经停（是否换机待核实）"
+                if stop.get("kind") == "same_flight_number"
+                else "中转"
+            )
+            parts.append(
+                ("%s %s，停留 %s 分钟" % (airport, kind, stop.get("duration_minutes", 0)))
+                + ("，过夜" if stop.get("overnight") else "")
+            )
+    parts.append("全程 %s 分钟" % flight.get("duration_minutes", 0))
+    if flight.get("self_transfer"):
+        parts.append("需自行中转")
+    return "；".join(parts)

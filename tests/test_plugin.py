@@ -45,6 +45,20 @@ def test_input_validation_and_aliases():
     settings = validate_settings("北京", "上海", FUTURE, "08:00-18:00", "国航,东航", "500")
     assert settings["airlines"] == "CA,MU"
     assert settings["target_price"] == 500
+    assert settings["allow_stopovers"] is False
+    assert settings["allow_connections"] is False
+
+    stopover_settings = validate_settings("北京", "上海", FUTURE, stop_policy="接受经停")
+    assert stopover_settings["allow_stopovers"] is True
+    assert stopover_settings["allow_connections"] is False
+
+    conn_settings = validate_settings("北京", "上海", FUTURE, stop_policy="接受中转")
+    assert conn_settings["allow_stopovers"] is False
+    assert conn_settings["allow_connections"] is True
+
+    both_settings = validate_settings("北京", "上海", FUTURE, stop_policy="接受经停与中转")
+    assert both_settings["allow_stopovers"] is True
+    assert both_settings["allow_connections"] is True
 
 
 @pytest.mark.parametrize(
@@ -76,6 +90,31 @@ async def test_real_command_parser_and_create_status_cancel(plugin):
     assert "覆盖" in (await anext(plugin.set_monitor(Event(), **kwargs)))
     assert "已停止" in (await anext(plugin.cancel_monitor(Event())))
     assert "没有监控" in (await anext(plugin.my_monitor(Event())))
+
+
+@pytest.mark.parametrize(
+    "policy,expected_scope,expected_stopovers,expected_connections",
+    [
+        ("接受经停", "直飞、经停", 1, 0),
+        ("接受中转", "直飞、中转", 0, 1),
+        ("接受经停与中转", "直飞、经停、中转", 1, 1),
+    ],
+)
+async def test_command_explicit_stop_permission(
+    plugin, policy, expected_scope, expected_stopovers, expected_connections
+):
+    command = CommandFilter(
+        "机票监控", handler_md=SimpleNamespace(handler=JipiaoPlugin.set_monitor)
+    )
+    kwargs = command.validate_and_convert_params(
+        ["PEK", "SHA", FUTURE, "-", "-", "500", policy], command.handler_params
+    )
+    response = await anext(plugin.set_monitor(Event(), **kwargs))
+    assert expected_scope in response
+    task = plugin.db.get_all_tasks()[0]
+    assert task["allow_stopovers"] == expected_stopovers
+    assert task["allow_connections"] == expected_connections
+    assert expected_scope in await anext(plugin.my_monitor(Event()))
 
 
 async def test_invalid_replacement_preserves_existing_task(plugin):

@@ -1,0 +1,59 @@
+{
+  "mode": "real",
+  "route": [
+    "北京",
+    "上海"
+  ],
+  "date": "2026-12-01",
+  "checked_at": "2026-10-21T19:11:14.116516+08:00",
+  "returned_count": 14,
+  "best": {
+    "flight_no": "KE2224 / KE2071",
+    "airline": "Korean Air",
+    "airline_code": "KE",
+    "dep_time": "10:25",
+    "arr_time": "09:40",
+    "arr_date": "2026-12-02",
+    "dep_airport": "PEK",
+    "arr_airport": "PVG",
+    "duration_minutes": 1395,
+    "stops": 1,
+    "legs": [
+      {
+        "flight_no": "KE2224",
+        "airline": "Korean Air",
+        "airline_code": "KE",
+        "dep_airport": "PEK",
+        "arr_airport": "PUS",
+        "dep_datetime": "2026-12-01T10:25:00",
+        "arr_datetime": "2026-12-01T14:05:00",
+        "duration_minutes": 160
+      },
+      {
+        "flight_no": "KE2071",
+        "airline": "Korean Air",
+        "airline_code": "KE",
+        "dep_airport": "PUS",
+        "arr_airport": "PVG",
+        "dep_datetime": "2026-12-02T08:35:00",
+        "arr_datetime": "2026-12-02T09:40:00",
+        "duration_minutes": 125
+      }
+    ],
+    "layovers": [
+      {
+        "arrival_airport": "PUS",
+        "departure_airport": "PUS",
+        "duration_minutes": 1110,
+        "overnight": true,
+        "change_of_airport": false,
+        "kind": "connection"
+      }
+    ],
+    "self_transfer": null,
+    "price": 1718,
+    "currency": "CNY",
+    "source": "Google Flights / fli"
+  },
+  "note": "本次返回结果中的最低价，不代表全网最低价"
+}
