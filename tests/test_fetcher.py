@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 from astrbot_plugin_jipiao import fetcher
+
 from fli.models import Airline, Airport
 
 

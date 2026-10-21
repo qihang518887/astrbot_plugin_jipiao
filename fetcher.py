@@ -5,8 +5,14 @@ import hashlib
 import math
 import random
 import re
+import sys
 import time
 from decimal import ROUND_CEILING, Decimal
+from pathlib import Path
+
+_PLUGIN_DIR = str(Path(__file__).resolve().parent)
+if _PLUGIN_DIR not in sys.path:
+    sys.path.insert(0, _PLUGIN_DIR)
 
 from .proxy import EnvironmentProxyClient
 

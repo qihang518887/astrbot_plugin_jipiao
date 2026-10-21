@@ -35,7 +35,6 @@
 ```powershell
 Set-Location 'D:\Program file\work\机票监控\AstrBot'
 uv sync
-uv pip install --python '.venv\Scripts\python.exe' -e '..\fli'
 New-Item -ItemType Directory -Path '.\data\plugins' -Force
 Expand-Archive -LiteralPath '..\astrbot_plugin_jipiao\dist\astrbot_plugin_jipiao.zip' -DestinationPath '.\data\plugins'
 $env:FLI_TIMEOUT = '20'
@@ -44,7 +43,7 @@ uv run --no-sync main.py
 
 安装后入口应位于 `AstrBot\data\plugins\astrbot_plugin_jipiao\main.py`。如已存在同名插件，请先停止/卸载旧版本再替换，不要把开发目录中的 `.venv` 复制过去。
 
-这里优先安装已检查的相邻 `fli` 源码；Python 发行包的名称是 `flights`。`requirements.txt` 固定为 `flights==0.10.0`。只安装同版本 PyPI 包不能证明代码与当前本地 checkout 一致。
+插件已直接内置（vendor）完整 `fli` 运行时，`requirements.txt` 采用标准 PyPI 依赖（`curl-cffi`、`pydantic`、`ratelimit`、`rich`、`tenacity` 等）。AstrBot 插件管理器在线安装时会自动由 pip 安装标准依赖，Linux ARM64 / x86_64 及 Windows 平台均有官方预编译 wheel，无需手动安装本地未发布的源码包。
 
 ### 自动读取代理环境变量（v0.1.1）
 
