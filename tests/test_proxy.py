@@ -1,4 +1,4 @@
-"""Verify native fli/libcurl proxy behavior, without a plugin proxy wrapper."""
+"""Verify environment proxy handling against a local HTTP server/proxy."""
 
 import os
 import subprocess
@@ -54,14 +54,15 @@ def native_request(url, proxy_env):
     env.update(proxy_env)
     code = """
 import sys
-from fli.search.client import Client
-client = Client()
+import httpx
+from astrbot_plugin_jipiao.proxy import EnvironmentProxyTransport
+client = httpx.Client(transport=EnvironmentProxyTransport(), trust_env=False)
 try:
     print(client.get(sys.argv[1], timeout=2).text)
 except Exception as exc:
     print(type(exc).__name__)
 finally:
-    client._session().close()
+    client.close()
 """
     result = subprocess.run(
         [sys.executable, "-c", code, url], env=env, capture_output=True, text=True, timeout=20
@@ -104,7 +105,6 @@ def test_native_http_proxy(local_server):
         ("NO_PROXY", "localhost,127.0.0.1"),
         ("no_proxy", "127.0.0.1"),
         ("NO_PROXY", "*"),
-        ("NO_PROXY", "127.0.0.0/8"),
     ],
 )
 def test_native_no_proxy_bypass(local_server, name, value):

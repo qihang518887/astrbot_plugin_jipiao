@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -9,6 +9,8 @@ from astrbot.api.event import MessageChain
 from astrbot.api.star import StarTools
 from astrbot.core.star.filter.command import CommandFilter
 from astrbot_plugin_jipiao.algorithm import CHINA_TZ
+from astrbot_plugin_jipiao.database import FlightDB
+from astrbot_plugin_jipiao.fetcher import fetch_raw_flights
 from astrbot_plugin_jipiao.main import JipiaoPlugin, validate_settings
 
 FUTURE = (datetime.now(CHINA_TZ) + timedelta(days=30)).strftime("%Y-%m-%d")
@@ -151,3 +153,85 @@ async def test_qq_group_restart_does_not_silently_consume_notification(plugin):
     platform._session_scene["group"] = "group"
     await plugin._send_message("qq:GroupMessage:user_group", "test")
     assert plugin.context.send_message.await_count == 1
+
+
+@pytest.mark.parametrize("config", [{}, {"data_source": "ctrip"}])
+async def test_ctrip_upgrade_preserves_complete_existing_tasks(monkeypatch, tmp_path, config):
+    """Open an existing v0.3.3 database, rather than creating replacement tasks."""
+    import json
+
+    old_db = FlightDB(str(tmp_path / "flights.sqlite3"))
+    for user_id, target in [('["qq","1"]', 500), ('["qq","2"]', None)]:
+        old_db.upsert_task(
+            user_id,
+            "qq:GroupMessage:existing_group",
+            "北京",
+            "上海",
+            FUTURE,
+            time_window="08:00-18:00",
+            airlines="CA,MU",
+            target_price=target,
+            allow_stopovers=True,
+            allow_connections=False,
+        )
+        old_db.update_lowest_3(user_id, '[{"p":400,"t":1770000000},{"p":420,"t":1770030000}]')
+        old_db.update_last_pushed_price(user_id, 450)
+        old_db.update_check(
+            user_id,
+            1770040000,
+            "查询成功",
+            json.dumps({"price": 440, "source": "Google Flights / fli"}),
+        )
+    before = old_db.get_all_tasks()
+    old_db.close()
+
+    monkeypatch.setattr(StarTools, "get_data_dir", lambda *args: tmp_path)
+    context = SimpleNamespace(
+        send_message=AsyncMock(return_value=True),
+        platform_manager=SimpleNamespace(get_insts=lambda: []),
+    )
+    instance = JipiaoPlugin(context, config)
+    assert instance.mock is False
+    assert instance.scheduler.fetcher.func is fetch_raw_flights
+    assert instance.scheduler.fetcher.keywords == {
+        "profile_dir": tmp_path / "browser" / "ctrip",
+        "storage_state": tmp_path / "cookies" / "ctrip_state.json",
+    }
+    assert instance.db.get_all_tasks() == before  # Every setting, state, revision and timestamp.
+    assert not (tmp_path / "mock.sqlite3").exists()
+
+    # Continue the existing target-price task, including the existing session/scope
+    # and lower-only push rule. No actual QQ message is sent.
+    quote = {
+        "price": 440,
+        "flight_no": "CA123",
+        "airline": "国航",
+        "airline_code": "CA",
+        "dep_time": "09:00",
+        "arr_time": "11:00",
+        "arr_date": FUTURE,
+        "dep_airport": "PEK",
+        "arr_airport": "PVG",
+        "itinerary_type": "nonstop",
+        "duration_minutes": 120,
+        "stops": 0,
+        "source": "携程 / Ctrip",
+    }
+    instance.scheduler.fetcher = AsyncMock(return_value=[quote])
+    await instance.scheduler._process_one(before[0])
+    instance.scheduler.fetcher.assert_awaited_once_with(
+        "北京", "上海", FUTURE, allow_stopovers=True, allow_connections=False
+    )
+    assert context.send_message.call_args.args[0] == "qq:GroupMessage:existing_group"
+    assert instance.db.get_task(before[0]["user_id"])["last_pushed_price"] == 440
+    assert instance.db.get_task(before[0]["user_id"])["lowest_3_json"] == before[0]["lowest_3_json"]
+    instance.db.close()
+
+
+@pytest.mark.parametrize("source", ["fli", "tuniu"])
+def test_legacy_source_requires_explicit_configuration(monkeypatch, source):
+    lookup = Mock()
+    monkeypatch.setattr(StarTools, "get_data_dir", lookup)
+    with pytest.raises(ValueError, match="ctrip"):
+        JipiaoPlugin(SimpleNamespace(), {"data_source": source})
+    lookup.assert_not_called()

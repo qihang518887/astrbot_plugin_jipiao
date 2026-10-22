@@ -1,0 +1,2899 @@
+{
+  "ResponseStatus": {
+    "Ack": "Success",
+    "Errors": []
+  },
+  "rlt": 0,
+  "rltstatus": 0,
+  "fltitem": [
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "GS6429",
+            "aircode": "GS"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 09:00:00",
+            "adate": "2026-11-05 12:20:00"
+          },
+          "fsitem": [
+            {
+              "city": "威海",
+              "stopTime": 40,
+              "citycode": "WEH"
+            }
+          ]
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 650.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱5.8折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "FM9092",
+            "aircode": "FM"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 13:05:00",
+            "adate": "2026-11-05 14:55:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 660.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.5折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "627_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 988.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.6折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "FM9094",
+            "aircode": "FM"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 14:30:00",
+            "adate": "2026-11-05 16:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 470.0,
+          "quantity": 10,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,StandardPrice,Luggage,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3.2折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "456_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 988.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.6折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6521",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:00:00",
+            "adate": "2026-11-05 09:10:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 350.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,PriceBidding,BusinessPriority,StandardPrice,Luggage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.4折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6533",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:00:00",
+            "adate": "2026-11-05 12:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 480.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3.3折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 2720.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱7.3折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6523",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 12:40:00",
+            "adate": "2026-11-05 14:40:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 430.0,
+          "quantity": 6,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,PriceBidding,EngineLowPrice,SurpriseProduct,LowPricePoolV1,PriorityPackage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.9折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1000.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱2.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6535",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 15:50:00",
+            "adate": "2026-11-05 17:50:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 440.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LimitedCtripMemberShip,WeakLimitedProduct,EngineLowPrice,Luggage,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 960.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱2.6折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6525",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:45:00",
+            "adate": "2026-11-05 19:50:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 420.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,StandardPrice,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.9折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CA8953",
+            "aircode": "CA"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:50:00",
+            "adate": "2026-11-05 10:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 490.0,
+          "quantity": 7,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,EngineLowPrice,Luggage,PriorityPackage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.4折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 900.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱2.9折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CA8911",
+            "aircode": "CA"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:40:00",
+            "adate": "2026-11-05 19:55:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 320.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,EngineLowPrice,Luggage,PriorityPackage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.9折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1130.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱3.6折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "HO1166",
+            "aircode": "HO"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 21:40:00",
+            "adate": "2026-11-05 23:45:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 450.0,
+          "quantity": 4,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "PriceBidding,TravelPackage,EngineLowPrice,ChannelEXCLUSIVE,LowPricePoolV1,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1060.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "HO5548",
+            "aircode": "HO"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 11:20:00",
+            "adate": "2026-11-05 13:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 830.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "HO5405",
+            "aircode": "HO"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 11:15:00",
+            "adate": "2026-11-05 13:30:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 1010.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱5.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "HO5490",
+            "aircode": "HO"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:25:00",
+            "adate": "2026-11-05 09:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 830.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "HO7570",
+            "aircode": "HO"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:00:00",
+            "adate": "2026-11-05 09:10:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 730.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.9折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "HO5441",
+            "aircode": "HO"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 16:50:00",
+            "adate": "2026-11-05 19:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 830.0,
+          "quantity": 8,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5622",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 21:00:00",
+            "adate": "2026-11-05 23:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 465.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,PriceBidding,EngineLowPrice,SurpriseProduct,LowPricePoolV1,PriorityPackage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.6折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "456_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1054.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5624",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 11:20:00",
+            "adate": "2026-11-05 13:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 535.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LimitedCardType,WeakLimitedProduct,PriceBidding,EngineLowPrice,SurpriseProduct,LowPricePoolV1,PriorityPackage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "523_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 2980.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱4.8折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5626",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 16:50:00",
+            "adate": "2026-11-05 19:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 350.0,
+          "quantity": 6,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,StandardPrice,Luggage,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1054.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU181",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 13:05:00",
+            "adate": "2026-11-05 14:55:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 660.0,
+          "quantity": 3,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "StandardPrice,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3.7折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "627_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1054.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5698",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 18:55:00",
+            "adate": "2026-11-05 21:15:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 770.0,
+          "quantity": 7,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,PriceBidding,EngineLowPrice,SurpriseProduct,LowPricePoolV1,PriorityPackage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.4折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "741_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 2980.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱4.8折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5628",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 18:50:00",
+            "adate": "2026-11-05 20:50:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 350.0,
+          "quantity": 10,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,StandardPrice,Luggage,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1233.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱2折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5674",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 09:05:00",
+            "adate": "2026-11-05 11:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 455.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,PriceBidding,EngineLowPrice,SurpriseProduct,LowPricePoolV1,PriorityPackage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.6折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "432_LimitedOldAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1054.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU345",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 14:30:00",
+            "adate": "2026-11-05 16:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 480.0,
+          "quantity": 3,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "StandardPrice,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.7折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "456_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1054.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5662",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:25:00",
+            "adate": "2026-11-05 09:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 350.0,
+          "quantity": 10,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,StandardPrice,Luggage,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2折",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1054.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱1.7折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MU5684",
+            "aircode": "MU"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 11:15:00",
+            "adate": "2026-11-05 13:30:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 770.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,PriceBidding,EngineLowPrice,SurpriseProduct,LowPricePoolV1,PriorityPackage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.4折",
+              "notetitle": null
+            },
+            {
+              "notetype": 20,
+              "notecnt": "741_LimitedYoungAgePolicy",
+              "notetitle": null
+            }
+          ]
+        },
+        {
+          "tprice": 1353.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "公务舱2.2折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC5327",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:40:00",
+            "adate": "2026-11-05 19:55:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 550.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC5788",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:50:00",
+            "adate": "2026-11-05 10:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 550.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MF3928",
+            "aircode": "MF"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 21:00:00",
+            "adate": "2026-11-05 23:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 565.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "PriceBidding,BusinessPriority,StandardPrice,Luggage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3.2折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MF3985",
+            "aircode": "MF"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 18:55:00",
+            "adate": "2026-11-05 21:15:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 795.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "PriceBidding,BusinessPriority,StandardPrice,Luggage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.5折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MF3973",
+            "aircode": "MF"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 11:15:00",
+            "adate": "2026-11-05 13:30:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 795.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "PriceBidding,BusinessPriority,StandardPrice,Luggage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱4.5折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MF3958",
+            "aircode": "MF"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 07:25:00",
+            "adate": "2026-11-05 09:25:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 565.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "PriceBidding,BusinessPriority,StandardPrice,Luggage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3.2折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "MF3966",
+            "aircode": "MF"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 09:05:00",
+            "adate": "2026-11-05 11:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 565.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "PriceBidding,BusinessPriority,StandardPrice,Luggage,IataNoProduct"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱3.2折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "9C8844",
+            "aircode": "9C"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 09:55:00",
+            "adate": "2026-11-05 12:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 350.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "WeakLimitedProduct,LimitedAirlineMembership,StandardPrice,AirlineMemberShip,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱2.2折",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4744",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:00:00",
+            "adate": "2026-11-05 17:55:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4605",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 20:30:00",
+            "adate": "2026-11-05 22:10:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 480.0,
+          "quantity": 3,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4732",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:35:00",
+            "adate": "2026-11-05 11:40:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4607",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:30:00",
+            "adate": "2026-11-05 19:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 480.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4732",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:35:00",
+            "adate": "2026-11-05 11:40:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4605",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 20:30:00",
+            "adate": "2026-11-05 22:10:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 480.0,
+          "quantity": 5,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4736",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 15:15:00",
+            "adate": "2026-11-05 16:10:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4607",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "PVG"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:30:00",
+            "adate": "2026-11-05 19:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 500.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC8811",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TNA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 14:45:00",
+            "adate": "2026-11-05 15:55:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC1167",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TNA"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:30:00",
+            "adate": "2026-11-05 19:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 450.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4744",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:00:00",
+            "adate": "2026-11-05 17:55:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4663",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 19:30:00",
+            "adate": "2026-11-05 21:15:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 500.0,
+          "quantity": 3,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4736",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 15:15:00",
+            "adate": "2026-11-05 16:10:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4663",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 19:30:00",
+            "adate": "2026-11-05 21:15:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 500.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4732",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:35:00",
+            "adate": "2026-11-05 11:40:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4663",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 19:30:00",
+            "adate": "2026-11-05 21:15:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 500.0,
+          "quantity": 3,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC8772",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TNA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:10:00",
+            "adate": "2026-11-05 11:25:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC1167",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TNA"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:30:00",
+            "adate": "2026-11-05 19:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 490.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC1195",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TNA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 13:30:00",
+            "adate": "2026-11-05 14:50:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC1167",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TNA"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 17:30:00",
+            "adate": "2026-11-05 19:05:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 490.0,
+          "quantity": 1,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "SC4732",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TAO"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:35:00",
+            "adate": "2026-11-05 11:40:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "SC4659",
+            "aircode": "SC"
+          },
+          "dportinfo": {
+            "aport": "TAO"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 15:30:00",
+            "adate": "2026-11-05 17:15:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 940.0,
+          "quantity": 6,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CA2920",
+            "aircode": "CA"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "TSN"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 09:50:00",
+            "adate": "2026-11-05 11:00:00"
+          },
+          "fsitem": null
+        },
+        {
+          "basinfo": {
+            "flgno": "CA2821",
+            "aircode": "CA"
+          },
+          "dportinfo": {
+            "aport": "TSN"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 14:55:00",
+            "adate": "2026-11-05 17:00:00"
+          },
+          "fsitem": null
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 930.0,
+          "quantity": 3,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "Normal"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "G523K3D",
+            "aircode": "G5"
+          },
+          "dportinfo": {
+            "aport": "DLC"
+          },
+          "aportinfo": {
+            "aport": "SHA"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-05 10:45:00",
+            "adate": "2026-11-05 15:25:00"
+          },
+          "fsitem": [
+            {
+              "city": "天津",
+              "stopTime": 80,
+              "citycode": "TSN"
+            }
+          ]
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 1050.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "VirtualTransfer,AirlineMarketing"
+                }
+              ]
+            },
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "VirtualTransfer,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": [
+            {
+              "notetype": 4,
+              "notecnt": "经济舱",
+              "notetitle": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

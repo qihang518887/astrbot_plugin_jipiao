@@ -1,0 +1,134 @@
+{
+  "observed_at": "2026-10-22T12:04:20.617690+08:00",
+  "source": "plugin fetch_raw_flights / ctrip",
+  "fresh_browser_profile": true,
+  "imported_portable_state": true,
+  "raw_itineraries": 47,
+  "normalized_itineraries": 36,
+  "types": {
+    "nonstop": 22,
+    "stopover": 2,
+    "connection": 12
+  },
+  "best": {
+    "itinerary_type": "nonstop",
+    "flight_no": "CA8911",
+    "airline": "中国国际航空",
+    "airline_code": "CA",
+    "dep_time": "17:40",
+    "arr_time": "19:55",
+    "arr_date": "2026-11-05",
+    "dep_airport": "DLC",
+    "arr_airport": "PVG",
+    "duration_minutes": 135,
+    "stops": 0,
+    "legs": [
+      {
+        "flight_no": "CA8911",
+        "airline": "中国国际航空",
+        "airline_code": "CA",
+        "dep_airport": "DLC",
+        "arr_airport": "PVG",
+        "dep_datetime": "2026-11-05T17:40:00",
+        "arr_datetime": "2026-11-05T19:55:00",
+        "duration_minutes": 135
+      }
+    ],
+    "layovers": [],
+    "self_transfer": false,
+    "price": 320,
+    "currency": "CNY",
+    "source": "携程 / Ctrip"
+  },
+  "stopover_sample": {
+    "itinerary_type": "stopover",
+    "flight_no": "GS6429",
+    "airline": "天津航空",
+    "airline_code": "GS",
+    "dep_time": "09:00",
+    "arr_time": "12:20",
+    "arr_date": "2026-11-05",
+    "dep_airport": "DLC",
+    "arr_airport": "PVG",
+    "duration_minutes": 200,
+    "stops": 1,
+    "legs": [
+      {
+        "flight_no": "GS6429",
+        "airline": "天津航空",
+        "airline_code": "GS",
+        "dep_airport": "DLC",
+        "arr_airport": "PVG",
+        "dep_datetime": "2026-11-05T09:00:00",
+        "arr_datetime": "2026-11-05T12:20:00",
+        "duration_minutes": 200
+      }
+    ],
+    "layovers": [
+      {
+        "arrival_airport": "WEH",
+        "departure_airport": "WEH",
+        "duration_minutes": 40,
+        "overnight": false,
+        "change_of_airport": false,
+        "kind": "same_flight_number"
+      }
+    ],
+    "self_transfer": false,
+    "price": 650,
+    "currency": "CNY",
+    "source": "携程 / Ctrip"
+  },
+  "connection_sample": {
+    "itinerary_type": "connection",
+    "flight_no": "SC4744 / SC4605",
+    "airline": "山东航空",
+    "airline_code": "SC",
+    "dep_time": "17:00",
+    "arr_time": "22:10",
+    "arr_date": "2026-11-05",
+    "dep_airport": "DLC",
+    "arr_airport": "PVG",
+    "duration_minutes": 310,
+    "stops": 1,
+    "legs": [
+      {
+        "flight_no": "SC4744",
+        "airline": "山东航空",
+        "airline_code": "SC",
+        "dep_airport": "DLC",
+        "arr_airport": "TAO",
+        "dep_datetime": "2026-11-05T17:00:00",
+        "arr_datetime": "2026-11-05T17:55:00",
+        "duration_minutes": 55
+      },
+      {
+        "flight_no": "SC4605",
+        "airline": "山东航空",
+        "airline_code": "SC",
+        "dep_airport": "TAO",
+        "arr_airport": "PVG",
+        "dep_datetime": "2026-11-05T20:30:00",
+        "arr_datetime": "2026-11-05T22:10:00",
+        "duration_minutes": 100
+      }
+    ],
+    "layovers": [
+      {
+        "arrival_airport": "TAO",
+        "departure_airport": "TAO",
+        "duration_minutes": 155,
+        "overnight": false,
+        "change_of_airport": false,
+        "kind": "connection"
+      }
+    ],
+    "self_transfer": null,
+    "price": 480,
+    "currency": "CNY",
+    "source": "携程 / Ctrip"
+  },
+  "monitor_database_accessed": false,
+  "notification_sent": false,
+  "normalization_replayed_after_final_changes": true
+}

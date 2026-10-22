@@ -20,10 +20,13 @@ def main():
         root / "requirements.txt",
         root / "README.md",
         root / "pyproject.toml",
+        root / "THIRD_PARTY_NOTICES.md",
+        root / "LICENSE.ctrip",
         *fli_files,
         *root.glob("tests/*.py"),
+        *root.glob("tests/fixtures/*.json"),
         *root.glob("experiments/*.py"),
-        *root.glob("validation/*.json"),
+        root / "validation/live_ctrip_plugin_2026-10-22.json",
     ]
     with ZipFile(target, "w", ZIP_DEFLATED) as archive:
         for path in sorted(files):

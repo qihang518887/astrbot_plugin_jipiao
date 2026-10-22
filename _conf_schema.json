@@ -2,9 +2,21 @@
   "data_source": {
     "description": "票价数据源",
     "type": "string",
-    "default": "fli",
-    "options": ["fli", "mock"],
-    "hint": "fli 为真实查询；mock 只生成明确标注的模拟报价。两种模式数据库独立，切换后仅当前模式的任务运行。"
+    "default": "ctrip",
+    "options": ["ctrip", "mock"],
+    "hint": "ctrip 使用携程查询国内机票，管理员私聊发送 /携程登录 扫码。只支持 ctrip 与 mock；升级前请将旧数据源改为 ctrip。mock 使用独立模拟数据库。"
+  },
+  "ctrip_storage_state": {
+    "description": "携程会话文件绝对路径",
+    "type": "string",
+    "default": "",
+    "hint": "留空即可：/携程登录 成功后自动保存至插件数据目录 cookies/ctrip_state.json。自定义时填写可读写绝对路径。文件含登录凭证。"
+  },
+  "ctrip_profile_dir": {
+    "description": "携程浏览器资料目录绝对路径",
+    "type": "string",
+    "default": "",
+    "hint": "留空使用插件数据目录 browser/ctrip。查询浏览器自动载入扫码保存的会话，不需要从其他设备复制浏览器资料。"
   },
   "round_interval_seconds": {
     "description": "每轮结束后的等待秒数",

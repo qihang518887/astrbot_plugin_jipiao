@@ -1,10 +1,12 @@
 """AstrBot commands and lifecycle for the flight monitoring plugin."""
 
+import asyncio
 import json
 import re
 import sys
 import time
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 
 _PLUGIN_DIR = str(Path(__file__).resolve().parent)
@@ -13,11 +15,13 @@ if _PLUGIN_DIR not in sys.path:
 
 from astrbot.api import AstrBotConfig
 from astrbot.api.event import AstrMessageEvent, MessageChain, filter
+from astrbot.api.message_components import Image
 from astrbot.api.star import Context, Star, StarTools, register
 from astrbot.core.platform.message_session import MessageSession
 from astrbot.core.platform.message_type import MessageType
 
 from .algorithm import CHINA_TZ, task_phase
+from .ctrip_login import qr_login
 from .database import FlightDB
 from .fetcher import (
     describe_itinerary,
@@ -110,22 +114,34 @@ def validate_settings(
     }
 
 
-@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.3.3")
+@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.6.0")
 class JipiaoPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
-        mode = config.get("data_source", "fli")
-        if mode not in {"fli", "mock"}:
-            raise ValueError("data_source must be fli or mock")
+        mode = config.get("data_source", "ctrip")
+        if mode not in {"ctrip", "mock"}:
+            raise ValueError("data_source must be ctrip or mock; 请在插件配置中将数据源改为 ctrip")
         self.mock = mode == "mock"
         interval = max(60, int(config.get("round_interval_seconds", 1800)))
         delay = max(1, int(config.get("task_delay_seconds", 30)))
         data_dir = StarTools.get_data_dir("astrbot_plugin_jipiao")
+        self.ctrip_profile = Path(
+            config.get("ctrip_profile_dir") or data_dir / "browser" / "ctrip"
+        ).expanduser()
+        self.ctrip_state = Path(
+            config.get("ctrip_storage_state") or data_dir / "cookies" / "ctrip_state.json"
+        ).expanduser()
+        self.login_lock = asyncio.Lock()
+        self.login_task = None
         self.db = FlightDB(str(data_dir / ("mock.sqlite3" if self.mock else "flights.sqlite3")))
         self.scheduler = MonitorScheduler(
             self.db,
             self._send_message,
-            fetcher=fetch_mock_flights if self.mock else fetch_raw_flights,
+            fetcher=fetch_mock_flights
+            if self.mock
+            else partial(
+                fetch_raw_flights, profile_dir=self.ctrip_profile, storage_state=self.ctrip_state
+            ),
             round_interval=interval,
             task_delay=delay,
             mock=self.mock,
@@ -135,6 +151,9 @@ class JipiaoPlugin(Star):
         self.scheduler.start()
 
     async def terminate(self):
+        if self.login_task is not None:
+            self.login_task.cancel()
+            await asyncio.gather(self.login_task, return_exceptions=True)
         await self.scheduler.stop()
         self.db.close()
 
@@ -170,6 +189,36 @@ class JipiaoPlugin(Star):
         sender_id = event.get_sender_id() if event else "unknown"
         return json.dumps([platform_id, sender_id], ensure_ascii=False)
 
+    @filter.permission_type(filter.PermissionType.ADMIN)
+    @filter.command("携程登录")
+    async def login_ctrip(self, event: AstrMessageEvent):
+        """管理员在当前私聊扫码；会话由插件运行的服务器保存。"""
+        from playwright.async_api import TimeoutError as PlaywrightTimeoutError
+
+        if not event.is_private_chat():
+            yield event.plain_result("请管理员私聊机器人发送 /携程登录。")
+            return
+        if self.login_lock.locked():
+            yield event.plain_result("已有携程登录进行中，请先完成本次扫码。")
+            return
+        async with self.login_lock:
+            self.login_task = asyncio.current_task()
+            try:
+                async with qr_login() as login:
+                    image = await login.start()
+                    yield event.plain_result(
+                        "请用携程 App 扫描下方二维码并确认登录，等待最多120秒。二维码过期请重新发送 /携程登录。"
+                    )
+                    yield event.chain_result([Image.fromBytes(image)])
+                    await login.wait_and_save(self.ctrip_state)
+                yield event.plain_result(
+                    "携程登录成功，会话已保存在机器人服务器，原监控继续使用。可查询机票验证票价接口。"
+                )
+            except PlaywrightTimeoutError:
+                yield event.plain_result("携程登录超时，未替换原会话。请重新发送 /携程登录。")
+            finally:
+                self.login_task = None
+
     @filter.command("机票监控")
     async def set_monitor(
         self,
@@ -191,7 +240,7 @@ class JipiaoPlugin(Star):
             message = (
                 str(exc)
                 if isinstance(exc, ValueError)
-                else "缺少 fli 依赖，请管理员按 README 安装本地 fli。"
+                else "缺少插件依赖，请管理员按 README 安装 requirements.txt。"
             )
             yield event.plain_result(f"{message}\n\n{USAGE}")
             return

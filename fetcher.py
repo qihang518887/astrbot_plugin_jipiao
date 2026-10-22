@@ -1,20 +1,18 @@
-"""Adapt fli one-way adult economy quotes to the plugin's small data model."""
+"""Adapt Ctrip one-way adult economy quotes to the plugin's existing data model."""
 
 import asyncio
 import hashlib
-import math
 import random
 import re
 import sys
 import time
-from decimal import ROUND_CEILING, Decimal
 from pathlib import Path
 
 _PLUGIN_DIR = str(Path(__file__).resolve().parent)
 if _PLUGIN_DIR not in sys.path:
     sys.path.insert(0, _PLUGIN_DIR)
 
-from .proxy import EnvironmentProxyClient
+from . import ctrip
 
 CITY_AIRPORTS = {
     "北京": ("PEK", "PKX"),
@@ -95,6 +93,8 @@ AIRLINE_ALIASES = {
     "联航": "KN",
     "中国联合航空": "KN",
     "西藏航空": "TV",
+    "天津航空": "GS",
+    "华夏航空": "G5",
 }
 
 
@@ -143,108 +143,21 @@ def _fetch_sync(
     flight_date: str,
     allow_stopovers: bool = False,
     allow_connections: bool = False,
+    *,
+    profile_dir: Path | None = None,
+    storage_state: Path | None = None,
 ) -> list[dict]:
-    from fli.models import (
-        Airport,
-        FlightSearchFilters,
-        FlightSegment,
-        MaxStops,
-        PassengerInfo,
-        SeatType,
-        SortBy,
+    departures, arrivals = resolve_airports(dep_city), resolve_airports(arr_city)
+    data = ctrip.query(
+        ctrip.CITY_CODES.get(departures[0], departures[0]),
+        ctrip.CITY_CODES.get(arrivals[0], arrivals[0]),
+        flight_date,
+        profile_dir=profile_dir or Path(__file__).parent / ".local" / "ctrip_browser",
+        storage_state=storage_state or Path(__file__).parent / ".local" / "ctrip_state.json",
     )
-    from fli.search import SearchFlights
-
-    filters = FlightSearchFilters(
-        passenger_info=PassengerInfo(adults=1),
-        flight_segments=[
-            FlightSegment(
-                departure_airport=[[Airport[code], 0] for code in resolve_airports(dep_city)],
-                arrival_airport=[[Airport[code], 0] for code in resolve_airports(arr_city)],
-                travel_date=flight_date,
-            )
-        ],
-        seat_type=SeatType.ECONOMY,
-        stops=MaxStops.ANY if allow_stopovers or allow_connections else MaxStops.NON_STOP,
-        sort_by=SortBy.CHEAPEST,
+    return ctrip.normalize(
+        data, departures, arrivals, flight_date, allow_stopovers, allow_connections
     )
-    search = SearchFlights()
-    search.client = EnvironmentProxyClient(search.client)
-    flights = search.search(filters, currency="CNY", language="zh-CN", country="CN")
-    normalized = []
-    for flight in flights or []:
-        if not (allow_stopovers or allow_connections) and len(flight.legs) > 1:
-            continue
-        if flight.price is None:
-            continue
-        if not math.isfinite(flight.price) or flight.price <= 0:
-            continue
-        if flight.currency and flight.currency.upper() != "CNY":
-            continue
-        first, last = flight.legs[0], flight.legs[-1]
-        if first.departure_datetime.strftime("%Y-%m-%d") != flight_date:
-            continue
-        legs = []
-        for leg in flight.legs:
-            code = leg.airline.name.removeprefix("_")
-            number = str(leg.flight_number)
-            legs.append(
-                {
-                    "flight_no": number if number.startswith(code) else f"{code}{number}",
-                    "airline": str(leg.airline.value),
-                    "airline_code": code,
-                    "dep_airport": leg.departure_airport.name,
-                    "arr_airport": leg.arrival_airport.name,
-                    "dep_datetime": leg.departure_datetime.isoformat(),
-                    "arr_datetime": leg.arrival_datetime.isoformat(),
-                    "duration_minutes": leg.duration,
-                }
-            )
-        layovers = [
-            {
-                "arrival_airport": previous["arr_airport"],
-                "departure_airport": following["dep_airport"],
-                "duration_minutes": layover.duration,
-                "overnight": layover.overnight,
-                "change_of_airport": layover.change_of_airport,
-                "kind": "same_flight_number"
-                if previous["flight_no"] == following["flight_no"]
-                and not layover.change_of_airport
-                and not flight.self_transfer
-                else "connection",
-            }
-            for previous, following, layover in zip(
-                legs[:-1], legs[1:], flight.layovers or [], strict=True
-            )
-        ]
-        itinerary_type = classify_itinerary(legs, layovers, flight.self_transfer)
-        if itinerary_type == "stopover" and not allow_stopovers:
-            continue
-        if itinerary_type == "connection" and not allow_connections:
-            continue
-        normalized.append(
-            {
-                "itinerary_type": itinerary_type,
-                "flight_no": " / ".join(leg["flight_no"] for leg in legs),
-                "airline": " / ".join(dict.fromkeys(leg["airline"] for leg in legs)),
-                "airline_code": ",".join(dict.fromkeys(leg["airline_code"] for leg in legs)),
-                "dep_time": first.departure_datetime.strftime("%H:%M"),
-                "arr_time": last.arrival_datetime.strftime("%H:%M"),
-                "arr_date": last.arrival_datetime.strftime("%Y-%m-%d"),
-                "dep_airport": first.departure_airport.name,
-                "arr_airport": last.arrival_airport.name,
-                "duration_minutes": flight.duration,
-                "stops": len(legs) - 1,
-                "legs": legs,
-                "layovers": layovers,
-                "self_transfer": flight.self_transfer,
-                # Round up so a fractional quote above a whole-yuan target never triggers it.
-                "price": int(Decimal(str(flight.price)).to_integral_value(rounding=ROUND_CEILING)),
-                "currency": "CNY",
-                "source": "Google Flights / fli",
-            }
-        )
-    return normalized
 
 
 async def fetch_raw_flights(
@@ -253,8 +166,11 @@ async def fetch_raw_flights(
     flight_date: str,
     allow_stopovers: bool = False,
     allow_connections: bool = False,
+    *,
+    profile_dir: Path | None = None,
+    storage_state: Path | None = None,
 ) -> list[dict]:
-    """Run blocking fli I/O outside the event loop and drain it on cancellation.
+    """Run blocking Ctrip browser I/O outside the event loop; drain on cancellation.
 
     Args:
         dep_city: Supported city alias or IATA airport code.
@@ -262,15 +178,27 @@ async def fetch_raw_flights(
         flight_date: Local departure date in YYYY-MM-DD format.
         allow_stopovers: Include same-flight-number stopovers when explicitly enabled.
         allow_connections: Include flight changes when independently enabled.
+        profile_dir: Persistent browser directory, separate from the monitor database.
+        storage_state: Portable Ctrip session file exported with ctrip_session.
 
     Returns:
         Priced adult economy itineraries matching the requested stop policy.
     """
-    worker = asyncio.create_task(
-        asyncio.to_thread(
-            _fetch_sync, dep_city, arr_city, flight_date, allow_stopovers, allow_connections
-        )
+    return await run_blocking(
+        _fetch_sync,
+        dep_city,
+        arr_city,
+        flight_date,
+        allow_stopovers,
+        allow_connections,
+        profile_dir=profile_dir,
+        storage_state=storage_state,
     )
+
+
+async def run_blocking(function, *args, **kwargs):
+    """Drain a blocking HTTP operation before closing its session on cancellation."""
+    worker = asyncio.create_task(asyncio.to_thread(function, *args, **kwargs))
     try:
         return await asyncio.shield(worker)
     except asyncio.CancelledError:

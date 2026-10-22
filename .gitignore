@@ -5,3 +5,10 @@ __pycache__/
 *.pyc
 *.sqlite3*
 dist/
+.local/
+**/tuniu_cookies.txt
+**/tuniu_browser/
+**/ctrip_state.json
+**/ctrip_browser/
+**/browser/
+**/user_data/

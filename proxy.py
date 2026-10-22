@@ -1,7 +1,9 @@
-"""Apply process proxy variables explicitly without changing fli's shared client."""
+"""Apply process proxy variables to this plugin's HTTP requests."""
 
 from urllib.parse import urlsplit
 from urllib.request import getproxies_environment, proxy_bypass_environment
+
+import httpx
 
 
 def proxy_for_url(url: str) -> str:
@@ -23,18 +25,18 @@ def proxy_for_url(url: str) -> str:
     return proxies.get(parts.scheme.lower()) or proxies.get("all") or ""
 
 
-class EnvironmentProxyClient:
-    """Forward requests to fli, preserving its retries, timeout and rate limiter."""
+class EnvironmentProxyTransport(httpx.BaseTransport):
+    """Resolve each destination independently, reusing connections per proxy."""
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self):
+        self.transports = {}
 
-    def get(self, url, **kwargs):
-        if "proxy" not in kwargs and "proxies" not in kwargs:
-            kwargs["proxy"] = proxy_for_url(url)
-        return self.client.get(url, **kwargs)
+    def handle_request(self, request):
+        proxy = proxy_for_url(str(request.url))
+        if proxy not in self.transports:
+            self.transports[proxy] = httpx.HTTPTransport(proxy=proxy or None, trust_env=False)
+        return self.transports[proxy].handle_request(request)
 
-    def post(self, url, **kwargs):
-        if "proxy" not in kwargs and "proxies" not in kwargs:
-            kwargs["proxy"] = proxy_for_url(url)
-        return self.client.post(url, **kwargs)
+    def close(self):
+        for transport in self.transports.values():
+            transport.close()

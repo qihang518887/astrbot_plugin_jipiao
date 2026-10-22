@@ -5,6 +5,7 @@ import asyncio
 import json
 import sys
 from datetime import datetime, timedelta
+from functools import partial
 from pathlib import Path
 
 _PLUGIN_DIR = str(Path(__file__).resolve().parent)
@@ -31,6 +32,8 @@ async def main():
     parser.add_argument("--time-window", default=None)
     parser.add_argument("--airlines", default=None)
     parser.add_argument("--mock", action="store_true", help="使用明确标注的模拟报价")
+    parser.add_argument("--profile-dir", type=Path, help="携程持久化浏览器目录")
+    parser.add_argument("--storage-state", type=Path, help="携程导出的会话文件")
     parser.add_argument("--allow-stopovers", action="store_true", help="允许经停，默认仅直飞")
     parser.add_argument("--allow-connections", action="store_true", help="允许中转，默认仅直飞")
     parser.add_argument("--allow-stops", action="store_true", help="允许经停与中转，默认仅直飞")
@@ -38,6 +41,10 @@ async def main():
     window = validate_time_window(args.time_window)
     airlines = normalize_airlines(args.airlines)
     fetcher = fetch_mock_flights if args.mock else fetch_raw_flights
+    if not args.mock:
+        fetcher = partial(
+            fetch_raw_flights, profile_dir=args.profile_dir, storage_state=args.storage_state
+        )
     if args.allow_stops:
         args.allow_stopovers = True
         args.allow_connections = True

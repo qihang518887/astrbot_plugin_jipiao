@@ -1,12 +1,8 @@
 import asyncio
 import threading
-from datetime import datetime
-from types import SimpleNamespace
 
 import pytest
 from astrbot_plugin_jipiao import fetcher
-
-from fli.models import Airline, Airport
 
 
 @pytest.mark.parametrize(
@@ -43,121 +39,10 @@ def test_filter_edges_empty_and_airline_aliases():
     assert fetcher.filter_and_get_lowest(flights, None, "CZ") is None
 
 
-def test_fli_conversion_uses_cny_and_skips_missing_foreign_and_invalid_prices(monkeypatch):
-    from fli.search import SearchFlights
-
-    leg = SimpleNamespace(
-        airline=Airline.CA,
-        flight_number="123",
-        departure_airport=Airport.PEK,
-        arrival_airport=Airport.SHA,
-        departure_datetime=datetime(2030, 12, 1, 8, 0),
-        arrival_datetime=datetime(2030, 12, 1, 10, 0),
-        duration=120,
-    )
-    captured = {}
-
-    def fake_search(self, filters, **kwargs):
-        assert isinstance(self.client, fetcher.EnvironmentProxyClient)
-        captured.update(kwargs)
-        assert len(filters.flight_segments[0].departure_airport) == 2
-        assert filters.stops.name == "NON_STOP"
-        return [
-            SimpleNamespace(
-                legs=legs,
-                price=price,
-                currency=currency,
-                duration=120,
-                layovers=None,
-                self_transfer=None,
-            )
-            for legs, price, currency in [
-                ([leg], 500.01, "CNY"),
-                ([leg], None, "CNY"),
-                ([leg], 100, "USD"),
-                ([leg], 0, "CNY"),
-            ]
-        ]
-
-    monkeypatch.setattr(SearchFlights, "search", fake_search)
-    flights = fetcher._fetch_sync("北京", "上海", "2030-12-01")
-    assert captured["currency"] == "CNY"
-    assert len(flights) == 1
-    assert flights[0]["price"] == 501
-    assert flights[0]["flight_no"] == "CA123"
-    assert flights[0]["stops"] == 0
-    assert "接口单航段" in fetcher.describe_itinerary(flights[0])
-
-
-@pytest.mark.parametrize("same_number", [False, True])
-def test_multileg_total_fare_last_arrival_and_stop_kind(monkeypatch, same_number):
-    from fli.models import FlightLeg, FlightResult, Layover
-    from fli.search import SearchFlights
-
-    flight = FlightResult(
-        price=420.2,
-        currency="CNY",
-        duration=1515,
-        stops=1,
-        self_transfer=not same_number,
-        legs=[
-            FlightLeg(
-                airline=Airline.CA,
-                flight_number="123",
-                departure_airport=Airport.PEK,
-                arrival_airport=Airport.CKG,
-                departure_datetime=datetime(2030, 12, 1, 8),
-                arrival_datetime=datetime(2030, 12, 1, 11),
-                duration=180,
-            ),
-            FlightLeg(
-                airline=Airline.CA if same_number else Airline.MU,
-                flight_number="123" if same_number else "456",
-                departure_airport=Airport.CKG,
-                arrival_airport=Airport.PVG,
-                departure_datetime=datetime(2030, 12, 2, 7),
-                arrival_datetime=datetime(2030, 12, 2, 9, 15),
-                duration=135,
-            ),
-        ],
-        layovers=[Layover(airport=Airport.CKG, duration=1200, overnight=True)],
-    )
-    monkeypatch.setattr(SearchFlights, "search", lambda *a, **kw: [flight])
-    if same_number:
-        (quote,) = fetcher._fetch_sync("北京", "上海", "2030-12-01", allow_stopovers=True)
-        assert fetcher._fetch_sync("北京", "上海", "2030-12-01", allow_connections=True) == []
-    else:
-        (quote,) = fetcher._fetch_sync("北京", "上海", "2030-12-01", allow_connections=True)
-        assert fetcher._fetch_sync("北京", "上海", "2030-12-01", allow_stopovers=True) == []
-    assert fetcher._fetch_sync("北京", "上海", "2030-12-01") == []
-    assert quote["price"] == 421  # Whole itinerary, not a sum of per-leg fares.
-    assert quote["dep_airport"] == "PEK"
-    assert quote["arr_airport"] == "PVG"
-    assert quote["dep_time"] == "08:00"
-    assert (quote["arr_date"], quote["arr_time"]) == ("2030-12-02", "09:15")
-    assert quote["duration_minutes"] == 1515
-    assert quote["stops"] == 1
-    assert len(quote["legs"]) == 2
-    assert quote["layovers"][0]["kind"] == ("same_flight_number" if same_number else "connection")
-    description = fetcher.describe_itinerary(quote)
-    assert "CKG" in description and "1200 分钟，过夜" in description
-    if same_number:
-        assert "是否换机待核实" in description
-        assert "同航班号经停" in description
-        assert fetcher.filter_and_get_lowest([quote], "08:00-08:00", "CA") == quote
-    else:
-        assert "需自行中转" in description
-        assert "中转行程（换航班）" in description
-        assert quote["flight_no"] == "CA123 / MU456"
-        assert fetcher.filter_and_get_lowest([quote], None, "CA") is None
-    assert fetcher.filter_and_get_lowest([quote], "08:01-18:00", None) is None
-    assert fetcher.filter_and_get_lowest([quote], None, "CA,MU") == quote
-
-
 async def test_worker_does_not_block_loop_and_is_drained_on_cancel(monkeypatch):
     started, release, finished = threading.Event(), threading.Event(), threading.Event()
 
-    def fake(*args):
+    def fake(*args, **kwargs):
         started.set()
         release.wait(3)
         finished.set()

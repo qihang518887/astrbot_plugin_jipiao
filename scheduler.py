@@ -7,6 +7,7 @@ import random
 import time
 
 from .algorithm import evaluate_flight, flight_timestamp, task_phase
+from .ctrip import CtripQueryError
 from .fetcher import describe_itinerary, fetch_raw_flights, filter_and_get_lowest
 
 logger = logging.getLogger(__name__)
@@ -125,10 +126,11 @@ class MonitorScheduler:
             async with self.user_lock(user_id):
                 current = self.db.get_task(user_id)
                 if current and current["revision"] == task["revision"]:
+                    detail = str(exc) if isinstance(exc, CtripQueryError) else type(exc).__name__
                     self.db.update_check(
                         user_id,
                         int(time.time()),
-                        f"查询失败（{type(exc).__name__}），下轮重试",
+                        f"查询失败（{detail}），下轮重试",
                         None,
                     )
             return
@@ -159,7 +161,7 @@ class MonitorScheduler:
                 f"{describe_itinerary(best)}\n"
                 f"本次匹配最低价：¥{best['price']} / 成人\n"
                 f"{decision['notify_reason']}\n"
-                f"数据来源：{best.get('source', 'Google Flights / fli')}\n"
+                f"数据来源：{best.get('source', '携程 / Ctrip')}\n"
                 "单程经济舱；报价向上取整，实际价格和税费以购票页面为准。\n"
                 "仅价格进一步降低时再次提醒；/取消监控 可停止。"
             )
