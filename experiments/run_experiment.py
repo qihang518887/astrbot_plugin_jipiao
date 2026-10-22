@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Verification experiment for:
-1. Flight price searching (SearchFlights via fli)
+1. Flight price searching (Ctrip browser fetcher)
 2. Adaptive monitoring timelines (Phase transitions & thresholds)
 3. Dynamic price baseline calculation & push cooling (37% rule & evaluate_flight)
 """
@@ -42,10 +42,17 @@ async def experiment_1_search():
     print(f"-> 目标航线: {dep_city} -> {arr_city} | 出发日期: {target_date}")
     print(f"-> 出发机场自动解析: {resolve_airports(dep_city)}")
     print(f"-> 到达机场自动解析: {resolve_airports(arr_city)}")
-    print("-> 正在通过 fli 驱动 Google Flights 发起真实请求...")
+    print("-> 正在通过携程浏览器发起真实请求...")
 
     try:
-        flights = await fetch_raw_flights(dep_city, arr_city, target_date)
+        local = Path(__file__).resolve().parents[1] / ".local"
+        flights = await fetch_raw_flights(
+            dep_city,
+            arr_city,
+            target_date,
+            profile_dir=local / "ctrip_browser",
+            storage_state=local / "ctrip_state.json",
+        )
         print(f"[✓] 搜寻成功！获取到 {len(flights)} 条有效直飞行程报价：")
         for i, f in enumerate(flights[:5], 1):
             print(

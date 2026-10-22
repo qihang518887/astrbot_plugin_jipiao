@@ -1,0 +1,132 @@
+{
+  "ResponseStatus": {
+    "Ack": "Success",
+    "Errors": []
+  },
+  "rlt": 0,
+  "rltstatus": 0,
+  "fltitem": [
+    {
+      "segtpe": 1,
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6800",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "URC"
+          },
+          "aportinfo": {
+            "aport": "DLC"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-08 09:45:00",
+            "adate": "2026-11-08 16:10:00"
+          },
+          "fsitem": [
+            {
+              "citycode": "TSN",
+              "stopTime": 60
+            }
+          ]
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 1170.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LimitedCtripMemberShip,WeakLimitedProduct,EngineLowPrice,Luggage,AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": []
+        },
+        {
+          "tprice": 2720.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": []
+        }
+      ]
+    },
+    {
+      "segtpe": 1,
+      "mutilstn": [
+        {
+          "basinfo": {
+            "flgno": "CZ6966",
+            "aircode": "CZ"
+          },
+          "dportinfo": {
+            "aport": "URC"
+          },
+          "aportinfo": {
+            "aport": "DLC"
+          },
+          "dateinfo": {
+            "ddate": "2026-11-08 17:25:00",
+            "adate": "2026-11-09 00:25:00"
+          },
+          "fsitem": [
+            {
+              "citycode": "SIA",
+              "stopTime": 65
+            }
+          ]
+        }
+      ],
+      "policyinfo": [
+        {
+          "tprice": 1230.0,
+          "quantity": 9,
+          "classinfor": [
+            {
+              "cgrd": 0,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "LockPrice,BusinessPriority,StandardPrice,Luggage"
+                }
+              ]
+            }
+          ],
+          "fnotelst": []
+        },
+        {
+          "tprice": 3300.0,
+          "quantity": 2,
+          "classinfor": [
+            {
+              "cgrd": 2,
+              "classNoteList": [
+                {
+                  "notetype": 3,
+                  "notecnt": "AirlineMarketing"
+                }
+              ]
+            }
+          ],
+          "fnotelst": []
+        }
+      ]
+    }
+  ]
+}

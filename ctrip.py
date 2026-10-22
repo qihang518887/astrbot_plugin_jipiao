@@ -31,26 +31,32 @@ class CtripQueryError(RuntimeError):
 
 def save_state(context, path: Path):
     """Export only Ctrip browser storage; never print session contents."""
-    state = context.storage_state(indexed_db=True)
+    state = context.storage_state(indexed_db=False)
     write_state(state, path)
+
+
+def session_state(state: dict) -> dict:
+    """Restore authentication storage only; do not replay the site's IndexedDB cache."""
+    return {
+        "cookies": [
+            item
+            for item in state["cookies"]
+            if item["domain"].lstrip(".") == "ctrip.com" or item["domain"].endswith(".ctrip.com")
+        ],
+        "origins": [
+            {"origin": item["origin"], "localStorage": item["localStorage"]}
+            for item in state["origins"]
+            if (urlsplit(item["origin"]).hostname or "").endswith(".ctrip.com")
+            or urlsplit(item["origin"]).hostname == "ctrip.com"
+        ],
+    }
 
 
 def write_state(state: dict, path: Path):
     """Atomically replace the Ctrip session after a successful login or query."""
-    state["cookies"] = [
-        item
-        for item in state["cookies"]
-        if item["domain"].lstrip(".") == "ctrip.com" or item["domain"].endswith(".ctrip.com")
-    ]
-    state["origins"] = [
-        item
-        for item in state["origins"]
-        if (urlsplit(item["origin"]).hostname or "").endswith(".ctrip.com")
-        or urlsplit(item["origin"]).hostname == "ctrip.com"
-    ]
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+    temporary.write_text(json.dumps(session_state(state), ensure_ascii=False), encoding="utf-8")
     os.chmod(temporary, 0o600)
     temporary.replace(path)
 
@@ -94,7 +100,9 @@ def browser(profile_dir: Path, storage_state: Path | None, *, headless=True, mob
                 "Object.defineProperty(navigator,'webdriver',{get:()=>undefined});"
             )
             if storage_state is not None and storage_state.is_file():
-                context.set_storage_state(storage_state)
+                context.set_storage_state(
+                    session_state(json.loads(storage_state.read_text(encoding="utf-8")))
+                )
             yield context
         finally:
             context.close()
@@ -103,7 +111,7 @@ def browser(profile_dir: Path, storage_state: Path | None, *, headless=True, mob
 def query(dep_code: str, arr_code: str, date: str, *, profile_dir: Path, storage_state: Path):
     """Load the official mobile page using the saved profile, once, without retries."""
     with _BROWSER_LOCK:
-        if not storage_state.is_file() and not (profile_dir / "Default").is_dir():
+        if not storage_state.is_file():
             raise CtripQueryError("未保存携程会话，请管理员私聊发送 /携程登录 并扫码确认")
         with browser(profile_dir, storage_state) as context:
             page = context.new_page()
@@ -153,8 +161,11 @@ def _ordinary_policy(policy: dict) -> bool:
         return False
     for cabin in policy["classinfor"]:
         for note in cabin.get("classNoteList") or []:
+            # The query uses a logged-in Ctrip account. This exact membership
+            # marker alone does not reject its fare; all other restrictions remain.
             if note["notetype"] == 3 and any(
-                token.strip().startswith("Limited") or token.strip() == "HighRisk"
+                (token.strip().startswith("Limited") and token.strip() != "LimitedCtripMemberShip")
+                or token.strip() == "HighRisk"
                 for token in (note.get("notecnt") or "").split(",")
             ):
                 return False

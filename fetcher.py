@@ -144,16 +144,16 @@ def _fetch_sync(
     allow_stopovers: bool = False,
     allow_connections: bool = False,
     *,
-    profile_dir: Path | None = None,
-    storage_state: Path | None = None,
+    profile_dir: Path,
+    storage_state: Path,
 ) -> list[dict]:
     departures, arrivals = resolve_airports(dep_city), resolve_airports(arr_city)
     data = ctrip.query(
         ctrip.CITY_CODES.get(departures[0], departures[0]),
         ctrip.CITY_CODES.get(arrivals[0], arrivals[0]),
         flight_date,
-        profile_dir=profile_dir or Path(__file__).parent / ".local" / "ctrip_browser",
-        storage_state=storage_state or Path(__file__).parent / ".local" / "ctrip_state.json",
+        profile_dir=profile_dir,
+        storage_state=storage_state,
     )
     return ctrip.normalize(
         data, departures, arrivals, flight_date, allow_stopovers, allow_connections
@@ -167,8 +167,8 @@ async def fetch_raw_flights(
     allow_stopovers: bool = False,
     allow_connections: bool = False,
     *,
-    profile_dir: Path | None = None,
-    storage_state: Path | None = None,
+    profile_dir: Path,
+    storage_state: Path,
 ) -> list[dict]:
     """Run blocking Ctrip browser I/O outside the event loop; drain on cancellation.
 
@@ -179,7 +179,7 @@ async def fetch_raw_flights(
         allow_stopovers: Include same-flight-number stopovers when explicitly enabled.
         allow_connections: Include flight changes when independently enabled.
         profile_dir: Persistent browser directory, separate from the monitor database.
-        storage_state: Portable Ctrip session file exported with ctrip_session.
+        storage_state: Explicit Ctrip session file saved by QR login or ctrip_session.
 
     Returns:
         Priced adult economy itineraries matching the requested stop policy.

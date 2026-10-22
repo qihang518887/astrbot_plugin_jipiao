@@ -1,0 +1,131 @@
+{
+  "observed_at": "2026-10-22T14:49:25.505856+08:00",
+  "queries": [
+    {
+      "route": [
+        "北京",
+        "上海"
+      ],
+      "date": "2026-11-05",
+      "raw_itineraries": 185,
+      "quotes": 136,
+      "types": {
+        "nonstop": 115,
+        "connection": 21
+      },
+      "state_bytes": 18441,
+      "exported_indexeddb": false
+    },
+    {
+      "route": [
+        "北京",
+        "上海"
+      ],
+      "date": "2026-11-05",
+      "raw_itineraries": 185,
+      "quotes": 136,
+      "types": {
+        "nonstop": 115,
+        "connection": 21
+      },
+      "state_bytes": 36213,
+      "exported_indexeddb": false
+    },
+    {
+      "route": [
+        "乌鲁木齐",
+        "大连"
+      ],
+      "date": "2026-11-08",
+      "raw_itineraries": 67,
+      "quotes": 46,
+      "types": {
+        "stopover": 5,
+        "connection": 41
+      },
+      "state_bytes": 57164,
+      "exported_indexeddb": false,
+      "CZ6800": {
+        "itinerary_type": "stopover",
+        "flight_no": "CZ6800",
+        "airline": "中国南方航空",
+        "airline_code": "CZ",
+        "dep_time": "09:45",
+        "arr_time": "16:10",
+        "arr_date": "2026-11-08",
+        "dep_airport": "URC",
+        "arr_airport": "DLC",
+        "duration_minutes": 385,
+        "stops": 1,
+        "legs": [
+          {
+            "flight_no": "CZ6800",
+            "airline": "中国南方航空",
+            "airline_code": "CZ",
+            "dep_airport": "URC",
+            "arr_airport": "DLC",
+            "dep_datetime": "2026-11-08T09:45:00",
+            "arr_datetime": "2026-11-08T16:10:00",
+            "duration_minutes": 385
+          }
+        ],
+        "layovers": [
+          {
+            "arrival_airport": "TSN",
+            "departure_airport": "TSN",
+            "duration_minutes": 60,
+            "overnight": false,
+            "change_of_airport": false,
+            "kind": "same_flight_number"
+          }
+        ],
+        "self_transfer": false,
+        "price": 1170,
+        "currency": "CNY",
+        "source": "携程 / Ctrip"
+      },
+      "CZ6966": {
+        "itinerary_type": "stopover",
+        "flight_no": "CZ6966",
+        "airline": "中国南方航空",
+        "airline_code": "CZ",
+        "dep_time": "17:25",
+        "arr_time": "00:25",
+        "arr_date": "2026-11-09",
+        "dep_airport": "URC",
+        "arr_airport": "DLC",
+        "duration_minutes": 420,
+        "stops": 1,
+        "legs": [
+          {
+            "flight_no": "CZ6966",
+            "airline": "中国南方航空",
+            "airline_code": "CZ",
+            "dep_airport": "URC",
+            "arr_airport": "DLC",
+            "dep_datetime": "2026-11-08T17:25:00",
+            "arr_datetime": "2026-11-09T00:25:00",
+            "duration_minutes": 420
+          }
+        ],
+        "layovers": [
+          {
+            "arrival_airport": "SIA",
+            "departure_airport": "SIA",
+            "duration_minutes": 65,
+            "overnight": false,
+            "change_of_airport": false,
+            "kind": "same_flight_number"
+          }
+        ],
+        "self_transfer": false,
+        "price": 1230,
+        "currency": "CNY",
+        "source": "携程 / Ctrip"
+      }
+    }
+  ],
+  "original_session_unchanged": true,
+  "monitor_database_accessed": false,
+  "notification_sent": false
+}

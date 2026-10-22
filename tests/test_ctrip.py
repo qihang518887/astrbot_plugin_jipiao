@@ -25,7 +25,7 @@ def normalize(raw, stopovers=False, connections=False):
 
 @pytest.mark.parametrize(
     "stops,connections,count",
-    [(False, False, 22), (True, False, 24), (False, True, 34), (True, True, 36)],
+    [(False, False, 23), (True, False, 25), (False, True, 35), (True, True, 37)],
 )
 def test_real_response_replay_and_independent_scope(raw, stops, connections, count):
     quotes = normalize(raw, stops, connections)
@@ -142,7 +142,9 @@ def test_fetcher_queries_city_but_filters_actual_airport(monkeypatch, raw, tmp_p
     )
     assert requests[0][0] == ("DLC", "SHA", "2026-11-05")
     assert fetcher.filter_and_get_lowest(quotes, None, None)["price"] == 320
-    hongqiao = fetcher._fetch_sync("DLC", "SHA", "2026-11-05")
+    hongqiao = fetcher._fetch_sync(
+        "DLC", "SHA", "2026-11-05", profile_dir=tmp_path, storage_state=tmp_path / "state.json"
+    )
     assert hongqiao and all(q["arr_airport"] == "SHA" for q in hongqiao)
     assert not any(q["flight_no"] == "CA8911" for q in hongqiao)
 
@@ -193,6 +195,7 @@ def test_upstream_rejection_fails_once_without_saving_session(monkeypatch, tmp_p
 
 def test_missing_session_does_not_start_anonymous_monitor(monkeypatch, tmp_path):
     monkeypatch.setattr(ctrip, "browser", lambda *a, **kw: pytest.fail("must not launch"))
+    (tmp_path / "Default").mkdir()  # A cached profile is not an alternate session source.
     with pytest.raises(ctrip.CtripQueryError, match="未保存携程会话"):
         ctrip.query(
             "DLC", "SHA", "2026-11-05", profile_dir=tmp_path, storage_state=tmp_path / "state.json"
@@ -206,7 +209,7 @@ def test_portable_session_export_only_includes_ctrip_storage(tmp_path):
             {"domain": "unrelated.example", "name": "other", "value": "test"},
         ],
         "origins": [
-            {"origin": "https://m.ctrip.com", "localStorage": []},
+            {"origin": "https://m.ctrip.com", "localStorage": [], "indexedDB": [{"name": "cache"}]},
             {"origin": "https://unrelated.example", "localStorage": []},
         ],
     }
@@ -216,6 +219,7 @@ def test_portable_session_export_only_includes_ctrip_storage(tmp_path):
     exported = json.loads(target.read_text(encoding="utf-8"))
     assert [c["domain"] for c in exported["cookies"]] == [".ctrip.com"]
     assert [o["origin"] for o in exported["origins"]] == ["https://m.ctrip.com"]
+    assert all("indexedDB" not in o for o in exported["origins"])
     assert not target.with_suffix(".tmp").exists()
 
 
@@ -224,7 +228,7 @@ def test_browser_imports_portable_state_and_closes_on_failure(monkeypatch, tmp_p
 
     calls = []
     state = tmp_path / "state.json"
-    state.write_text("{}")
+    state.write_text('{"cookies": [], "origins": []}')
     context = SimpleNamespace(
         add_init_script=lambda script: None,
         set_storage_state=lambda path: calls.append(path),
@@ -246,7 +250,7 @@ def test_browser_imports_portable_state_and_closes_on_failure(monkeypatch, tmp_p
     with pytest.raises(ValueError, match="test failure"):
         with ctrip.browser(tmp_path / "new-profile", state):
             raise ValueError("test failure")
-    assert calls == [state, "closed"]
+    assert calls == [{"cookies": [], "origins": []}, "closed"]
     assert launches[0]["headless"] is True and launches[0]["is_mobile"] is True
     assert launches[0]["user_data_dir"] == str(tmp_path / "new-profile")
     assert launches[0]["proxy"] == {
@@ -255,6 +259,103 @@ def test_browser_imports_portable_state_and_closes_on_failure(monkeypatch, tmp_p
         "password": "secret",
         "bypass": "localhost,127.0.0.1",
     }
+
+
+def test_repeated_restore_and_export_excludes_indexeddb_from_existing_state(monkeypatch, tmp_path):
+    """Regress the real restore failure on out-of-line IndexedDB keys."""
+    import playwright.sync_api as playwright_api
+
+    state = {
+        "cookies": [{"domain": ".ctrip.com", "name": "session", "value": "test"}],
+        "origins": [
+            {
+                "origin": "https://m.ctrip.com",
+                "localStorage": [{"name": "login", "value": "preserved"}],
+                "indexedDB": [{"name": "cached-flights", "stores": [{"records": [{"value": 0}]}]}],
+            }
+        ],
+    }
+    target = tmp_path / "state.json"
+    target.write_text(json.dumps(state), encoding="utf-8")
+    imports, exports = [], []
+
+    def restore(value):
+        assert all("indexedDB" not in o for o in value["origins"])
+        imports.append(value)
+
+    def export(*, indexed_db):
+        exports.append(indexed_db)
+        return copy.deepcopy(state)
+
+    context = SimpleNamespace(
+        add_init_script=lambda script: None,
+        set_storage_state=restore,
+        storage_state=export,
+        close=lambda: None,
+    )
+
+    @contextmanager
+    def playwright():
+        yield SimpleNamespace(
+            chromium=SimpleNamespace(launch_persistent_context=lambda **kwargs: context)
+        )
+
+    monkeypatch.setattr(playwright_api, "sync_playwright", playwright)
+    for _ in range(3):
+        with ctrip.browser(tmp_path / "same-profile", target) as opened:
+            ctrip.save_state(opened, target)
+    assert len(imports) == 3 and exports == [False, False, False]
+    saved = json.loads(target.read_text(encoding="utf-8"))
+    assert saved["cookies"] == state["cookies"]
+    assert saved["origins"] == [
+        {"origin": "https://m.ctrip.com", "localStorage": [{"name": "login", "value": "preserved"}]}
+    ]
+
+
+def test_ctrip_membership_quote_is_kept_with_technical_stop(raw):
+    item = copy.deepcopy(next(i for i in raw["fltitem"] if i["mutilstn"][0]["fsitem"]))
+    item["segtpe"] = 1
+    policy = item["policyinfo"][0]
+    item["policyinfo"] = [policy]
+    policy["classinfor"][0]["classNoteList"] = [
+        {"notetype": 3, "notecnt": "Normal,LimitedCtripMemberShip"}
+    ]
+    policy["fnotelst"] = []
+    data = {"fltitem": [item]}
+    assert normalize(data) == []  # segtpe=1 does not erase an fsitem technical stop.
+    (quote,) = normalize(data, True)
+    assert quote["itinerary_type"] == "stopover"
+    assert quote["price"] == policy["tprice"]
+
+
+def test_live_urc_dlc_member_fares_are_stopovers_not_nonstops():
+    data = json.loads(
+        (Path(__file__).parent / "fixtures/ctrip_urc_dlc_2026-11-08.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert ctrip.normalize(data, ("URC",), ("DLC",), "2026-11-08") == []
+    quotes = ctrip.normalize(data, ("URC",), ("DLC",), "2026-11-08", allow_stopovers=True)
+    by_flight = {q["flight_no"]: q for q in quotes}
+    assert set(by_flight) == {"CZ6800", "CZ6966"}
+    first = by_flight["CZ6800"]
+    assert first["price"] == 1170
+    assert first["itinerary_type"] == "stopover"
+    assert first["layovers"][0]["arrival_airport"] == "TSN"
+    assert first["layovers"][0]["duration_minutes"] == 60
+    assert by_flight["CZ6966"]["arr_date"] == "2026-11-09"
+
+
+@pytest.mark.parametrize(
+    "flag", ["LimitedAirlineMembership", "LimitedCardType", "LimitedStudentPolicy", "HighRisk"]
+)
+def test_ctrip_membership_does_not_remove_other_purchase_restrictions(raw, flag):
+    policy = copy.deepcopy(raw["fltitem"][0]["policyinfo"][0])
+    policy["fnotelst"] = []
+    policy["classinfor"][0]["classNoteList"] = [
+        {"notetype": 3, "notecnt": f"LimitedCtripMemberShip,{flag}"}
+    ]
+    assert not ctrip._ordinary_policy(policy)
 
 
 def test_export_uses_saved_profile_instead_of_reimporting_old_state(monkeypatch, tmp_path):

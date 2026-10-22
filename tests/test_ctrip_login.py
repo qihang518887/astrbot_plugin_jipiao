@@ -28,7 +28,9 @@ def page_context():
             {"domain": ".ctrip.com", "name": "session", "value": "test-private"},
             {"domain": ".example.com", "name": "unrelated", "value": "excluded"},
         ],
-        "origins": [{"origin": "https://m.ctrip.com", "localStorage": []}],
+        "origins": [
+            {"origin": "https://m.ctrip.com", "localStorage": [], "indexedDB": [{"name": "cache"}]}
+        ],
     }
     context = SimpleNamespace(
         new_page=AsyncMock(return_value=page),
@@ -56,6 +58,8 @@ async def test_qr_requires_official_confirmation_before_replacing_session(page_c
     )
     saved = json.loads(target.read_text(encoding="utf-8"))
     assert [c["name"] for c in saved["cookies"]] == ["session"]
+    assert "indexedDB" not in saved["origins"][0]
+    context.storage_state.assert_awaited_once_with(indexed_db=False)
     assert not target.with_suffix(".tmp").exists()
 
 
@@ -218,9 +222,7 @@ async def test_query_and_login_share_the_same_confirmed_state(page_context, monk
     await login.wait_and_save(path)
     imported = []
     sync_context = Mock()
-    sync_context.set_storage_state.side_effect = lambda p: imported.append(
-        json.loads(p.read_text(encoding="utf-8"))
-    )
+    sync_context.set_storage_state.side_effect = lambda state: imported.append(state)
     playwright = Mock()
     playwright.chromium.launch_persistent_context.return_value = sync_context
     manager = Mock()

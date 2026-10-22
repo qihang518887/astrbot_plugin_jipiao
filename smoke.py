@@ -32,8 +32,18 @@ async def main():
     parser.add_argument("--time-window", default=None)
     parser.add_argument("--airlines", default=None)
     parser.add_argument("--mock", action="store_true", help="使用明确标注的模拟报价")
-    parser.add_argument("--profile-dir", type=Path, help="携程持久化浏览器目录")
-    parser.add_argument("--storage-state", type=Path, help="携程导出的会话文件")
+    parser.add_argument(
+        "--profile-dir",
+        type=Path,
+        default=Path(__file__).parent / ".local/ctrip_browser",
+        help="携程持久化浏览器目录",
+    )
+    parser.add_argument(
+        "--storage-state",
+        type=Path,
+        default=Path(__file__).parent / ".local/ctrip_state.json",
+        help="携程导出的会话文件",
+    )
     parser.add_argument("--allow-stopovers", action="store_true", help="允许经停，默认仅直飞")
     parser.add_argument("--allow-connections", action="store_true", help="允许中转，默认仅直飞")
     parser.add_argument("--allow-stops", action="store_true", help="允许经停与中转，默认仅直飞")

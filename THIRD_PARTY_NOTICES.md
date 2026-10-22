@@ -13,3 +13,7 @@ The Ctrip source requires Playwright on the query host, including the server.
 
 The official QR login lifecycle in `ctrip_login.py` is plugin-specific; it uses
 the same browser launch settings and saves the confirmed session on the query host.
+
+v0.6.1 excludes IndexedDB caches from both session restore and export, requires
+explicit fetcher session paths, and accepts the exact LimitedCtripMemberShip
+fare marker while preserving other purchase restrictions and stop permissions.

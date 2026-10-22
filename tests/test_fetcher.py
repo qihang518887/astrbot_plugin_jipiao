@@ -39,7 +39,7 @@ def test_filter_edges_empty_and_airline_aliases():
     assert fetcher.filter_and_get_lowest(flights, None, "CZ") is None
 
 
-async def test_worker_does_not_block_loop_and_is_drained_on_cancel(monkeypatch):
+async def test_worker_does_not_block_loop_and_is_drained_on_cancel(monkeypatch, tmp_path):
     started, release, finished = threading.Event(), threading.Event(), threading.Event()
 
     def fake(*args, **kwargs):
@@ -49,7 +49,11 @@ async def test_worker_does_not_block_loop_and_is_drained_on_cancel(monkeypatch):
         return []
 
     monkeypatch.setattr(fetcher, "_fetch_sync", fake)
-    work = asyncio.create_task(fetcher.fetch_raw_flights("PEK", "SHA", "2030-12-01"))
+    work = asyncio.create_task(
+        fetcher.fetch_raw_flights(
+            "PEK", "SHA", "2030-12-01", profile_dir=tmp_path, storage_state=tmp_path / "state.json"
+        )
+    )
     for _ in range(200):
         if started.is_set():
             break

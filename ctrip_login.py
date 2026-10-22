@@ -34,7 +34,7 @@ class CtripQRLogin:
         # Ctrip's official login page redirects to BackUrl after confirmation.
         # Merely displaying/scanning the QR code never exports a session.
         await self.page.wait_for_url("https://www.ctrip.com/", timeout=LOGIN_TIMEOUT_MS)
-        state = await self.context.storage_state(indexed_db=True)
+        state = await self.context.storage_state(indexed_db=False)
         await run_blocking(_commit_state, state, path)
 
 
