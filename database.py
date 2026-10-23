@@ -1,9 +1,12 @@
 """SQLite persistence; all access stays on the event-loop thread."""
 
+import json
 import sqlite3
 import time
 import uuid
 from pathlib import Path
+
+from .algorithm import normalize_lowest_3
 
 
 class FlightDB:
@@ -63,6 +66,15 @@ class FlightDB:
                 + reset_where,
                 (int(time.time()),),
             )
+        # Repair old six-hour deduplication results without resetting the task.
+        for row in self.conn.execute("SELECT user_id, lowest_3_json FROM tasks").fetchall():
+            recorded = json.loads(row["lowest_3_json"])
+            lowest = normalize_lowest_3(recorded)
+            if lowest != recorded:
+                self.conn.execute(
+                    "UPDATE tasks SET lowest_3_json=? WHERE user_id=?",
+                    (json.dumps(lowest), row["user_id"]),
+                )
         self.conn.commit()
 
     def upsert_task(
@@ -116,6 +128,10 @@ class FlightDB:
             return self.conn.execute("DELETE FROM tasks WHERE user_id=?", (user_id,)).rowcount > 0
 
     def update_lowest_3(self, user_id: str, lowest_3_json: str):
+        recorded = json.loads(lowest_3_json)
+        lowest = normalize_lowest_3(recorded)
+        if lowest != recorded:
+            lowest_3_json = json.dumps(lowest)
         with self.conn:
             self.conn.execute(
                 "UPDATE tasks SET lowest_3_json=? WHERE user_id=?", (lowest_3_json, user_id)

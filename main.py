@@ -20,7 +20,7 @@ from astrbot.api.star import Context, Star, StarTools, register
 from astrbot.core.platform.message_session import MessageSession
 from astrbot.core.platform.message_type import MessageType
 
-from .algorithm import CHINA_TZ, task_phase
+from .algorithm import CHINA_TZ, normalize_lowest_3, task_phase
 from .ctrip_login import qr_login
 from .database import FlightDB
 from .fetcher import (
@@ -114,7 +114,7 @@ def validate_settings(
     }
 
 
-@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.6.1")
+@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.6.2")
 class JipiaoPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
@@ -282,7 +282,7 @@ class JipiaoPlugin(Star):
             yield event.plain_result("您当前没有监控任务。\n" + USAGE)
             return
         phase, deadline = task_phase(task, int(time.time()))
-        prices = json.loads(task["lowest_3_json"])
+        prices = normalize_lowest_3(json.loads(task["lowest_3_json"]))
         recorded = "、".join(f"¥{item['p']}" for item in prices) or "暂无"
         checked = (
             datetime.fromtimestamp(task["last_checked_at"], CHINA_TZ).strftime("%m-%d %H:%M:%S")
@@ -297,7 +297,7 @@ class JipiaoPlugin(Star):
             + f"时间段：{task['time_window'] or '不限'}；航司：{task['airlines'] or '不限'}\n"
             + f"航程类型：{scope_text}\n"
             + f"目标价：{'¥' + str(task['target_price']) if task['target_price'] is not None else '未设置'}\n"
-            + f"当前阶段：{phase}\n观察期最低3次：{recorded}\n"
+            + f"当前阶段：{phase}\n观察期最低3个不同价格：{recorded}\n"
             + f"上次提交推送价格：{'¥' + str(task['last_pushed_price']) if task['last_pushed_price'] is not None else '暂无'}\n"
             + f"最近检查（北京时间）：{checked}\n状态：{task['last_status'] or '等待后台检查'}"
         )
@@ -558,7 +558,7 @@ class JipiaoPlugin(Star):
         if task is None:
             return "您当前没有任何正在运行的机票监控任务。"
         phase, deadline = task_phase(task, int(time.time()))
-        prices = json.loads(task["lowest_3_json"])
+        prices = normalize_lowest_3(json.loads(task["lowest_3_json"]))
         recorded = "、".join(f"¥{item['p']}" for item in prices) or "暂无"
         checked = (
             datetime.fromtimestamp(task["last_checked_at"], CHINA_TZ).strftime("%m-%d %H:%M:%S")
@@ -574,7 +574,7 @@ class JipiaoPlugin(Star):
             f"航程类型: {scope_text}",
             f"目标价: {'¥' + str(task['target_price']) if task['target_price'] is not None else '未设置(启用37%观察策略)'}",
             f"当前阶段: {phase}",
-            f"观察期已记录低价: {recorded}",
+            f"观察期最低3个不同价格: {recorded}",
             f"上次推送价格: {'¥' + str(task['last_pushed_price']) if task['last_pushed_price'] is not None else '暂无'}",
             f"最近检查状态: {task['last_status'] or '等待后台检查'} (检查时间: {checked})",
         ]

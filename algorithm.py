@@ -11,6 +11,14 @@ def flight_timestamp(flight_date: str) -> int:
     return int(datetime.strptime(flight_date, "%Y-%m-%d").replace(tzinfo=CHINA_TZ).timestamp())
 
 
+def normalize_lowest_3(records: list[dict]) -> list[dict]:
+    """Return up to three distinct lowest prices with their first recorded times."""
+    by_price = {}
+    for item in sorted(records, key=lambda item: item["t"]):
+        by_price.setdefault(item["p"], item)
+    return [by_price[price] for price in sorted(by_price)[:3]]
+
+
 def task_phase(task: dict, now_ts: int) -> tuple[str, int | None]:
     """Return the phase and observation deadline shared by commands and decisions."""
     flight_ts = flight_timestamp(task["flight_date"])
@@ -62,12 +70,14 @@ def evaluate_flight(task: dict, best_flight: dict | None, now_ts: int) -> dict:
     elif phase == "起飞前7天兜底期":
         reason = "已进入起飞前7天临期阶段，当前符合条件的最低价"
     else:
-        lowest = json.loads(task["lowest_3_json"])
+        recorded = json.loads(task["lowest_3_json"])
+        lowest = normalize_lowest_3(recorded)
         if phase == "观察期":
-            if not any(item["p"] == price and now_ts - item["t"] < 21600 for item in lowest):
-                lowest.append({"p": price, "t": now_ts})
-                lowest.sort(key=lambda item: item["p"])
-                result["new_lowest_3_json"] = json.dumps(lowest[:3])
+            if not any(item["p"] == price for item in lowest):
+                lowest = normalize_lowest_3([*lowest, {"p": price, "t": now_ts}])
+        if lowest != recorded:
+            result["new_lowest_3_json"] = json.dumps(lowest)
+        if phase == "观察期":
             return result
         if not lowest:
             return result

@@ -1,7 +1,13 @@
 import json
 
 import pytest
-from astrbot_plugin_jipiao.algorithm import DAY, evaluate_flight, flight_timestamp, task_phase
+from astrbot_plugin_jipiao.algorithm import (
+    DAY,
+    evaluate_flight,
+    flight_timestamp,
+    normalize_lowest_3,
+    task_phase,
+)
 
 FLIGHT = flight_timestamp("2030-12-01")
 
@@ -56,17 +62,57 @@ def test_wait_period_and_first_observation_boundary():
     assert not result["should_notify"]
 
 
-def test_observation_lowest_three_and_six_hour_deduplication():
+@pytest.mark.parametrize("elapsed", [0, 21599, 21600, DAY, 3 * DAY])
+def test_repeated_price_never_occupies_another_observation_slot(elapsed):
     now = FLIGHT - 50 * DAY
     row = task(
         lowest_3_json=json.dumps(
             [{"p": 400, "t": now - 21599}, {"p": 500, "t": now - DAY}, {"p": 600, "t": now - DAY}]
         )
     )
-    assert evaluate_flight(row, {"price": 400}, now)["new_lowest_3_json"] is None
-    result = evaluate_flight(row, {"price": 400}, now + 1)
-    assert [x["p"] for x in json.loads(result["new_lowest_3_json"])] == [400, 400, 500]
-    assert len(json.loads(row["lowest_3_json"])) == 3
+    result = evaluate_flight(row, {"price": 400}, now + elapsed)
+    assert result["new_lowest_3_json"] is None
+    assert not result["should_notify"]
+    assert [x["p"] for x in json.loads(row["lowest_3_json"])] == [400, 500, 600]
+
+
+def test_observation_keeps_three_distinct_lowest_prices_across_queries():
+    row = task()
+    now = FLIGHT - 50 * DAY
+    for index, price in enumerate([600, 500, 400, 400, 450, 300, 600]):
+        result = evaluate_flight(row, {"price": price}, now + index * 21600)
+        if result["new_lowest_3_json"] is not None:
+            row["lowest_3_json"] = result["new_lowest_3_json"]
+        assert not result["should_notify"]
+    assert json.loads(row["lowest_3_json"]) == [
+        {"p": 300, "t": now + 5 * 21600},
+        {"p": 400, "t": now + 2 * 21600},
+        {"p": 450, "t": now + 4 * 21600},
+    ]
+
+
+def test_legacy_duplicate_prices_keep_earliest_time_and_are_repaired_in_observation():
+    records = [{"p": 400, "t": 3}, {"p": 500, "t": 2}, {"p": 400, "t": 1}]
+    expected = [{"p": 400, "t": 1}, {"p": 500, "t": 2}]
+    assert normalize_lowest_3(records) == expected
+    row = task(lowest_3_json=json.dumps(records))
+    result = evaluate_flight(row, {"price": 400}, FLIGHT - 50 * DAY)
+    assert json.loads(result["new_lowest_3_json"]) == expected
+    assert json.loads(row["lowest_3_json"]) == records
+
+
+@pytest.mark.parametrize("price,notify", [(400, True), (450, False)])
+def test_decision_repairs_legacy_duplicates_and_uses_available_distinct_prices(price, notify):
+    row = task(lowest_3_json='[{"p":400,"t":1},{"p":400,"t":2},{"p":400,"t":3}]')
+    result = evaluate_flight(row, {"price": price}, FLIGHT - 20 * DAY)
+    assert json.loads(result["new_lowest_3_json"]) == [{"p": 400, "t": 1}]
+    assert result["should_notify"] is notify
+
+
+def test_higher_new_price_does_not_change_full_observation_list():
+    row = task(lowest_3_json='[{"p":400,"t":1},{"p":450,"t":2},{"p":500,"t":3}]')
+    result = evaluate_flight(row, {"price": 600}, FLIGHT - 50 * DAY)
+    assert result["new_lowest_3_json"] is None
 
 
 def test_exact_observation_deadline_is_still_observation():

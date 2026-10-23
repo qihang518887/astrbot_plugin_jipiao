@@ -127,6 +127,23 @@ async def test_invalid_replacement_preserves_existing_task(plugin):
     assert plugin.db.get_all_tasks()[0] == before
 
 
+async def test_command_and_llm_status_display_distinct_observation_prices(plugin):
+    await anext(plugin.set_monitor(Event(), "PEK", "SHA", FUTURE))
+    with plugin.db.conn:
+        plugin.db.conn.execute(
+            "UPDATE tasks SET lowest_3_json=?",
+            ('[{"p":400,"t":1},{"p":400,"t":2},{"p":500,"t":3}]',),
+        )
+    responses = [
+        await anext(plugin.my_monitor(Event())),
+        await plugin.get_flight_monitor_tool(Event()),
+    ]
+    for response in responses:
+        assert "观察期最低3个不同价格" in response
+        assert response.count("¥400") == 1
+        assert response.count("¥500") == 1
+
+
 async def test_adapter_wraps_text_as_real_message_chain(plugin):
     await plugin._send_message(Event.unified_msg_origin, "test")
     chain = plugin.context.send_message.call_args.args[1]

@@ -57,6 +57,54 @@ def test_persistence(tmp_path):
     second.close()
 
 
+def test_legacy_duplicate_migration_preserves_task_and_survives_reopen(tmp_path):
+    path = str(tmp_path / "legacy_duplicates.sqlite3")
+    database = FlightDB(path)
+    database.upsert_task("u", "original-session", "PEK", "SHA", "2099-12-01")
+    database.update_last_pushed_price("u", 390)
+    # Simulate a database written by the old six-hour deduplication rule.
+    with database.conn:
+        database.conn.execute(
+            "UPDATE tasks SET lowest_3_json=? WHERE user_id='u'",
+            ('[{"p":400,"t":3},{"p":500,"t":2},{"p":400,"t":1}]',),
+        )
+    before = database.get_task("u")
+    database.close()
+    expected = [{"p": 400, "t": 1}, {"p": 500, "t": 2}]
+    for _ in range(2):
+        reopened = FlightDB(path)
+        after = reopened.get_task("u")
+        assert json.loads(after["lowest_3_json"]) == expected
+        assert {k: v for k, v in after.items() if k != "lowest_3_json"} == {
+            k: v for k, v in before.items() if k != "lowest_3_json"
+        }
+        reopened.close()
+
+
+def test_database_write_rejects_duplicate_price_slots(db):
+    db.update_lowest_3("u1", '[{"p":400,"t":3},{"p":400,"t":1},{"p":500,"t":2}]')
+    assert json.loads(db.get_task("u1")["lowest_3_json"]) == [
+        {"p": 400, "t": 1},
+        {"p": 500, "t": 2},
+    ]
+
+
+async def test_scheduler_persists_distinct_observation_prices_across_six_hour_gaps(db, monkeypatch):
+    from astrbot_plugin_jipiao.algorithm import DAY, flight_timestamp
+
+    now = flight_timestamp("2030-12-01") - 50 * DAY
+    monkeypatch.setattr("astrbot_plugin_jipiao.scheduler.time.time", lambda: now)
+    db.upsert_task("u1", "qq:FriendMessage:1", "PEK", "SHA", "2030-12-01")
+    fetch, send = AsyncMock(), AsyncMock()
+    scheduler = MonitorScheduler(db, send, fetcher=fetch, round_interval=0)
+    for price in [500, 400, 400, 450, 300]:
+        fetch.return_value = [{**QUOTE, "price": price}]
+        await scheduler._process_one(db.get_task("u1"))
+        now += 7 * 3600
+    assert [item["p"] for item in json.loads(db.get_task("u1")["lowest_3_json"])] == [300, 400, 450]
+    send.assert_not_awaited()
+
+
 async def test_expired_task_deleted_without_network(db):
     db.upsert_task("u1", "qq:FriendMessage:1", "PEK", "SHA", "2000-01-01")
     fetch, send = AsyncMock(), AsyncMock()
