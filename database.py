@@ -37,7 +37,8 @@ class FlightDB:
                 revision TEXT NOT NULL DEFAULT '',
                 last_checked_at INTEGER DEFAULT NULL,
                 last_status TEXT DEFAULT NULL,
-                last_best_json TEXT DEFAULT NULL
+                last_best_json TEXT DEFAULT NULL,
+                observation_notified_at INTEGER DEFAULT NULL
             )
         """)
         # Add task settings to existing installations as the schema evolves.
@@ -47,6 +48,7 @@ class FlightDB:
             "last_checked_at": "INTEGER DEFAULT NULL",
             "last_status": "TEXT DEFAULT NULL",
             "last_best_json": "TEXT DEFAULT NULL",
+            "observation_notified_at": "INTEGER DEFAULT NULL",
             "allow_stopovers": "INTEGER NOT NULL DEFAULT 0",
             "allow_connections": "INTEGER NOT NULL DEFAULT 0",
         }.items():
@@ -141,6 +143,12 @@ class FlightDB:
         with self.conn:
             self.conn.execute(
                 "UPDATE tasks SET last_pushed_price=? WHERE user_id=?", (price, user_id)
+            )
+
+    def mark_observation_notified(self, user_id: str, now_ts: int):
+        with self.conn:
+            self.conn.execute(
+                "UPDATE tasks SET observation_notified_at=? WHERE user_id=?", (now_ts, user_id)
             )
 
     def update_check(self, user_id: str, now_ts: int, status: str, best_json: str | None):

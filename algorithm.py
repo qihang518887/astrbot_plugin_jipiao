@@ -19,6 +19,29 @@ def normalize_lowest_3(records: list[dict]) -> list[dict]:
     return [by_price[price] for price in sorted(by_price)[:3]]
 
 
+def decision_threshold(records: list[dict]) -> int | None:
+    """Use the second distinct low, or the sole price when only one was observed."""
+    lowest = normalize_lowest_3(records)
+    return lowest[min(1, len(lowest) - 1)]["p"] if lowest else None
+
+
+def observation_window(task: dict) -> tuple[int, int]:
+    flight_ts = flight_timestamp(task["flight_date"])
+    start = max(task["created_at"], flight_ts - 60 * DAY)
+    deadline = start + max(int((flight_ts - 7 * DAY - start) * 0.37), 43200)
+    return start, deadline
+
+
+def observation_finished(task: dict, now_ts: int) -> bool:
+    """A real observation window ended, including interruption by the seven-day fallback."""
+    flight_ts = flight_timestamp(task["flight_date"])
+    if task["target_price"] is not None or now_ts >= flight_ts:
+        return False
+    start, deadline = observation_window(task)
+    end_7 = flight_ts - 7 * DAY
+    return start < end_7 and (now_ts > deadline or now_ts >= end_7)
+
+
 def task_phase(task: dict, now_ts: int) -> tuple[str, int | None]:
     """Return the phase and observation deadline shared by commands and decisions."""
     flight_ts = flight_timestamp(task["flight_date"])
@@ -31,8 +54,7 @@ def task_phase(task: dict, now_ts: int) -> tuple[str, int | None]:
         return "等待期（起飞前60天开始观察）", None
     if now_ts >= end_7:
         return "起飞前7天兜底期", None
-    start = max(task["created_at"], start_60)
-    deadline = start + max(int((end_7 - start) * 0.37), 43200)
+    _, deadline = observation_window(task)
     return ("观察期" if now_ts <= deadline else "决策期"), deadline
 
 
@@ -81,15 +103,19 @@ def evaluate_flight(task: dict, best_flight: dict | None, now_ts: int) -> dict:
             return result
         if not lowest:
             return result
-        threshold = max(item["p"] for item in lowest)
-        if price <= threshold:
-            reason = f"触发37%观察策略提醒（观察期低谷基准价：¥{threshold}）"
+        threshold = decision_threshold(lowest)
+        if price < threshold:
+            label = "第二低价" if len(lowest) >= 2 else "唯一已记录价格"
+            reason = f"触发37%观察策略提醒（低于观察期{label}：¥{threshold}）"
             minimum = min(item["p"] for item in lowest)
             if price < minimum:
                 reason += "，刷新观察期最低价"
             elif price == minimum:
                 reason += "，追平观察期最低价"
     last = task["last_pushed_price"]
-    if reason and (last is None or price < last):
+    # Decision mode accepts a changed qualifying quote even after a cheaper alert.
+    # Target-price and seven-day fallback modes retain further-drop-only alerts.
+    fresh_price = price != last if phase == "决策期" else last is None or price < last
+    if reason and fresh_price:
         result.update(should_notify=True, notify_reason=reason, new_pushed_price=price)
     return result

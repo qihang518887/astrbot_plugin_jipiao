@@ -6,7 +6,14 @@ import logging
 import random
 import time
 
-from .algorithm import evaluate_flight, flight_timestamp, task_phase
+from .algorithm import (
+    decision_threshold,
+    evaluate_flight,
+    flight_timestamp,
+    normalize_lowest_3,
+    observation_finished,
+    task_phase,
+)
 from .ctrip import CtripQueryError
 from .fetcher import describe_itinerary, fetch_raw_flights, filter_and_get_lowest
 
@@ -23,6 +30,7 @@ class MonitorScheduler:
         db,
         send_msg_callback,
         *,
+        send_observation_callback=None,
         fetcher=fetch_raw_flights,
         round_interval=3600,
         task_delay=45,
@@ -30,6 +38,7 @@ class MonitorScheduler:
     ):
         self.db = db
         self.send_msg_callback = send_msg_callback
+        self.send_observation_callback = send_observation_callback
         self.fetcher = fetcher
         self.round_interval = round_interval
         self.task_delay = task_delay
@@ -85,6 +94,43 @@ class MonitorScheduler:
             except TimeoutError:
                 pass
 
+    async def _notify_observation_end(self, task: dict, now: int) -> bool:
+        """Called under the user lock; return whether delivery was attempted."""
+        if task["observation_notified_at"] is not None or not observation_finished(task, now):
+            return False
+        lowest = normalize_lowest_3(json.loads(task["lowest_3_json"]))
+        lines = [
+            "【模拟模式】" if self.mock else "【机票观察期结束】",
+            f"{task['dep_city']} → {task['arr_city']}｜{task['flight_date']}",
+            f"观察期已结束，已进入{task_phase(task, now)[0]}。",
+            "观察期最低3个不同价格（从低到高）：",
+        ]
+        for index in range(3):
+            value = f"¥{lowest[index]['p']}" if index < len(lowest) else "暂无记录"
+            lines.append(f"{index + 1}. {value}")
+        threshold = decision_threshold(lowest)
+        if task_phase(task, now)[0] == "起飞前7天兜底期":
+            lines.append("已进入起飞前7天，按临期兜底策略提醒，之后仅进一步降价再次提醒。")
+        elif threshold is None:
+            lines.append("观察期没有有效报价，暂不设置决策基准；进入起飞前7天后按兜底策略提醒。")
+        else:
+            label = "第二低价" if len(lowest) >= 2 else "唯一已记录价格（不足两种价格）"
+            lines.append(
+                f"之后匹配报价低于{label} ¥{threshold} 时提醒；连续相同的提醒价不重复发送。"
+            )
+        try:
+            if self.send_observation_callback is not None:
+                sent = await self.send_observation_callback(task, "\n".join(lines))
+            else:
+                sent = await self.send_msg_callback(task["session_id"], "\n".join(lines))
+            if sent is False:
+                raise RuntimeError("Message platform was not found")
+        except Exception:
+            logger.exception("Observation completion notification failed; will retry")
+        else:
+            self.db.mark_observation_notified(task["user_id"], now)
+        return True
+
     async def _process_one(self, task: dict):
         user_id = task["user_id"]
         async with self.user_lock(user_id):
@@ -102,6 +148,7 @@ class MonitorScheduler:
                     + "已到出发日北京时间零点，任务已删除。",
                 )
                 return
+            observation_attempted = await self._notify_observation_end(task, now)
             if (
                 task["last_checked_at"] is not None
                 and now - task["last_checked_at"] < self.round_interval
@@ -126,6 +173,8 @@ class MonitorScheduler:
             async with self.user_lock(user_id):
                 current = self.db.get_task(user_id)
                 if current and current["revision"] == task["revision"]:
+                    if not observation_attempted:
+                        await self._notify_observation_end(current, int(time.time()))
                     detail = str(exc) if isinstance(exc, CtripQueryError) else type(exc).__name__
                     self.db.update_check(
                         user_id,
@@ -140,6 +189,8 @@ class MonitorScheduler:
             if current is None or current["revision"] != task["revision"]:
                 return
             now = int(time.time())
+            if not observation_attempted:
+                await self._notify_observation_end(current, now)
             decision = evaluate_flight(current, best, now)
             if decision["is_expired"]:
                 self.db.delete_task(user_id)
@@ -163,7 +214,12 @@ class MonitorScheduler:
                 f"{decision['notify_reason']}\n"
                 f"数据来源：{best.get('source', '携程 / Ctrip')}\n"
                 "单程经济舱；报价向上取整，实际价格和税费以购票页面为准。\n"
-                "仅价格进一步降低时再次提醒；/取消监控 可停止。"
+                + (
+                    "低于观察期第二低价（不足两种时使用唯一记录）即可提醒；连续相同的提醒价不重复发送。"
+                    if task_phase(current, now)[0] == "决策期"
+                    else "仅价格进一步降低时再次提醒。"
+                )
+                + " /取消监控 可停止。"
             )
             try:
                 sent = await self.send_msg_callback(task["session_id"], text)

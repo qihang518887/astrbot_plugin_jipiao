@@ -174,6 +174,34 @@ async def test_adapter_wraps_text_as_real_message_chain(plugin):
         await plugin._send_message(Event.unified_msg_origin, "test")
 
 
+@pytest.mark.parametrize("message_type", ["GroupMessage", "FriendMessage"])
+async def test_observation_summary_mentions_original_sender_only_in_group(plugin, message_type):
+    from astrbot.api.message_components import At, Plain
+
+    task = {"user_id": '["qq", "member-openid"]', "session_id": f"qq:{message_type}:group"}
+    assert plugin.scheduler.send_observation_callback == plugin._send_observation_message
+    await plugin._send_observation_message(task, "观察期已结束")
+    session, chain = plugin.context.send_message.call_args.args
+    assert session == task["session_id"]
+    mentions = [component for component in chain.chain if isinstance(component, At)]
+    assert [str(component.qq) for component in mentions] == (
+        ["member-openid"] if message_type == "GroupMessage" else []
+    )
+    assert "观察期已结束" in "".join(c.text for c in chain.chain if isinstance(c, Plain))
+    assert chain.use_markdown_ is False
+    assert chain.use_t2i_ is False
+
+
+async def test_observation_summary_checks_platform_before_mention(plugin):
+    from astrbot_plugin_jipiao.scheduler import NotificationNotReady
+
+    with pytest.raises(NotificationNotReady):
+        await plugin._send_observation_message(
+            {"user_id": '["other", "1"]', "session_id": "qq:GroupMessage:group"}, "test"
+        )
+    plugin.context.send_message.assert_not_awaited()
+
+
 async def test_qq_group_restart_does_not_silently_consume_notification(plugin):
     from astrbot_plugin_jipiao.scheduler import NotificationNotReady
 

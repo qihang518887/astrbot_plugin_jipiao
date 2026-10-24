@@ -101,7 +101,7 @@ def test_legacy_duplicate_prices_keep_earliest_time_and_are_repaired_in_observat
     assert json.loads(row["lowest_3_json"]) == records
 
 
-@pytest.mark.parametrize("price,notify", [(400, True), (450, False)])
+@pytest.mark.parametrize("price,notify", [(399, True), (400, False), (450, False)])
 def test_decision_repairs_legacy_duplicates_and_uses_available_distinct_prices(price, notify):
     row = task(lowest_3_json='[{"p":400,"t":1},{"p":400,"t":2},{"p":400,"t":3}]')
     result = evaluate_flight(row, {"price": price}, FLIGHT - 20 * DAY)
@@ -124,7 +124,14 @@ def test_exact_observation_deadline_is_still_observation():
 
 @pytest.mark.parametrize(
     "price,notify,word",
-    [(501, False, ""), (500, True, "基准价"), (400, True, "追平"), (399, True, "刷新")],
+    [
+        (501, False, ""),
+        (500, False, ""),
+        (450, False, ""),
+        (449, True, "第二低价：¥450"),
+        (400, True, "追平"),
+        (399, True, "刷新"),
+    ],
 )
 def test_decision_threshold_and_wording(price, notify, word):
     row = task(lowest_3_json='[{"p": 400, "t": 1}, {"p": 450, "t": 2}, {"p": 500, "t": 3}]')
@@ -136,6 +143,30 @@ def test_decision_threshold_and_wording(price, notify, word):
 def test_no_observations_waits_until_seven_day_fallback():
     assert not evaluate_flight(task(), {"price": 900}, FLIGHT - 10 * DAY)["should_notify"]
     assert evaluate_flight(task(), {"price": 900}, FLIGHT - 7 * DAY)["should_notify"]
+
+
+@pytest.mark.parametrize(
+    "price,last,notify", [(420, 400, True), (420, 420, False), (400, 420, True)]
+)
+def test_decision_accepts_changed_price_below_second_low_after_cheaper_alert(price, last, notify):
+    row = task(
+        lowest_3_json='[{"p":400,"t":1},{"p":450,"t":2},{"p":500,"t":3}]',
+        last_pushed_price=last,
+    )
+    result = evaluate_flight(row, {"price": price}, FLIGHT - 20 * DAY)
+    assert result["should_notify"] is notify
+
+
+def test_two_distinct_prices_use_second_price_strictly():
+    row = task(lowest_3_json='[{"p":400,"t":1},{"p":450,"t":2}]')
+    assert evaluate_flight(row, {"price": 449}, FLIGHT - 20 * DAY)["should_notify"]
+    assert not evaluate_flight(row, {"price": 450}, FLIGHT - 20 * DAY)["should_notify"]
+
+
+def test_fallback_still_only_alerts_on_further_price_drop():
+    row = task(last_pushed_price=400)
+    assert not evaluate_flight(row, {"price": 420}, FLIGHT - 7 * DAY)["should_notify"]
+    assert evaluate_flight(row, {"price": 399}, FLIGHT - 7 * DAY)["should_notify"]
 
 
 def test_late_creation_minimum_observation_and_fallback_priority():

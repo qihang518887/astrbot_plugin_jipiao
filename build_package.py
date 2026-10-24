@@ -25,10 +25,13 @@ def main():
         *fli_files,
         *root.glob("tests/*.py"),
         *root.glob("tests/fixtures/*.json"),
-        *root.glob("experiments/*.py"),
+        root / "experiments/check_stops.py",
+        root / "experiments/run_experiment.py",
+        root / "experiments/verify_fuzzy_calendar.py",
         root / "validation/live_ctrip_plugin_2026-10-22.json",
         root / "validation/live_ctrip_repeat_2026-10-22.json",
         root / "validation/live_fuzzy_calendar_2026-10-25.json",
+        root / "validation/live_plugin_fli_2026-10-21.json",
     ]
     with ZipFile(target, "w", ZIP_DEFLATED) as archive:
         for path in sorted(files):

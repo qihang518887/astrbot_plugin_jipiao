@@ -115,7 +115,7 @@ def validate_settings(
     }
 
 
-@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.7.0")
+@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.7.1")
 class JipiaoPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
@@ -139,6 +139,7 @@ class JipiaoPlugin(Star):
         self.scheduler = MonitorScheduler(
             self.db,
             self._send_message,
+            send_observation_callback=self._send_observation_message,
             fetcher=fetch_mock_flights
             if self.mock
             else partial(
@@ -159,7 +160,16 @@ class JipiaoPlugin(Star):
         await self.scheduler.stop()
         self.db.close()
 
-    async def _send_message(self, session_id: str, text: str):
+    async def _send_observation_message(self, task: dict, text: str):
+        platform_id, sender_id = json.loads(task["user_id"])
+        session = MessageSession.from_str(task["session_id"])
+        if platform_id != session.platform_id:
+            raise NotificationNotReady("监控用户与通知会话的平台不一致，请重新设置监控")
+        return await self._send_message(task["session_id"], text, mention_user_id=str(sender_id))
+
+    async def _send_message(
+        self, session_id: str, text: str, *, mention_user_id: str | None = None
+    ):
         session = MessageSession.from_str(session_id)
         # The inspected QQ adapter silently returns if group scene state was
         # lost on restart. Do not consume a low-price notification in that case.
@@ -178,7 +188,10 @@ class JipiaoPlugin(Star):
                         "QQ群会话未就绪，请在设置监控的原群发送 /我的监控，并确认已开启群主动发言"
                     )
             break
-        chain = MessageChain().message(text)
+        chain = MessageChain()
+        if mention_user_id and session.message_type == MessageType.GROUP_MESSAGE:
+            chain.at(name="", qq=mention_user_id).message("\n")
+        chain.message(text)
         chain.use_markdown_ = False
         chain.use_t2i_ = False
         matched = await self.context.send_message(session_id, chain)
