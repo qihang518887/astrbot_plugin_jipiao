@@ -191,6 +191,34 @@ async def test_wake_does_not_requery_recent_tasks(db):
     assert fetch.await_count == 1
 
 
+async def test_two_users_use_45_second_jitter_then_one_hour_round_wait(db, monkeypatch):
+    from unittest.mock import Mock, call
+
+    from astrbot_plugin_jipiao import scheduler as scheduler_module
+
+    db.upsert_task("u2", "qq:FriendMessage:2", "PEK", "SHA", "2099-12-01", target_price=500)
+    scheduler = MonitorScheduler(db, AsyncMock())
+    scheduler._process_one = AsyncMock()
+    sleep = AsyncMock()
+    jitter = Mock(return_value=45)
+    timeouts = []
+
+    async def wait_for(awaitable, timeout):
+        awaitable.close()
+        timeouts.append(timeout)
+        scheduler.running = False
+
+    monkeypatch.setattr(scheduler_module.asyncio, "sleep", sleep)
+    monkeypatch.setattr(scheduler_module.asyncio, "wait_for", wait_for)
+    monkeypatch.setattr(scheduler_module.random, "uniform", jitter)
+    scheduler.running = True
+    await scheduler._loop()
+    assert scheduler._process_one.await_count == 2
+    assert jitter.call_args_list == [call(42, 48), call(42, 48)]
+    assert sleep.await_args_list == [call(45), call(45)]
+    assert timeouts == [3600]
+
+
 async def test_notification_preserves_connection_details(db, connecting_quote, monkeypatch):
     from astrbot_plugin_jipiao.algorithm import flight_timestamp
 

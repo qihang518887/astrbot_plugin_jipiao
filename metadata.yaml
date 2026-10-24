@@ -1,7 +1,7 @@
 name: astrbot_plugin_jipiao
 display_name: 机票低价监控
 desc: 携程国内单程机票监控，复用登录会话；默认直飞，经停与中转独立设置，保留原任务、价格策略及 QQ 提醒。
-version: v0.6.2
+version: v0.7.0
 author: qihang518887
 astrbot_version: ">=4.29.1"
 repo: https://github.com/qihang518887/astrbot_plugin_jipiao

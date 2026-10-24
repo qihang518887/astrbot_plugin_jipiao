@@ -24,8 +24,8 @@ class MonitorScheduler:
         send_msg_callback,
         *,
         fetcher=fetch_raw_flights,
-        round_interval=1800,
-        task_delay=30,
+        round_interval=3600,
+        task_delay=45,
         mock=False,
     ):
         self.db = db
@@ -74,7 +74,7 @@ class MonitorScheduler:
                     except Exception:
                         logger.exception("Flight monitor task failed")
                     await asyncio.sleep(
-                        random.uniform(max(0, self.task_delay - 1), self.task_delay + 2)
+                        random.uniform(max(0, self.task_delay - 3), self.task_delay + 3)
                     )
             except Exception:
                 logger.exception("Flight monitor round failed")

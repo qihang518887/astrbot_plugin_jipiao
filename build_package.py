@@ -28,6 +28,7 @@ def main():
         *root.glob("experiments/*.py"),
         root / "validation/live_ctrip_plugin_2026-10-22.json",
         root / "validation/live_ctrip_repeat_2026-10-22.json",
+        root / "validation/live_fuzzy_calendar_2026-10-25.json",
     ]
     with ZipFile(target, "w", ZIP_DEFLATED) as archive:
         for path in sorted(files):

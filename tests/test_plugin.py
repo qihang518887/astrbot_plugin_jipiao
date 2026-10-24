@@ -58,6 +58,25 @@ def test_input_validation_and_aliases():
     assert conn_settings["allow_stopovers"] is False
     assert conn_settings["allow_connections"] is True
 
+
+@pytest.mark.parametrize(
+    "config,expected_interval,expected_delay",
+    [
+        ({}, 3600, 45),
+        ({"round_interval_seconds": 1800, "task_delay_seconds": 30}, 3600, 45),
+        ({"round_interval_seconds": 60, "task_delay_seconds": 1}, 3600, 45),
+        ({"round_interval_seconds": 7200, "task_delay_seconds": 90}, 7200, 90),
+    ],
+)
+def test_polling_defaults_and_existing_fast_config_are_clamped(
+    monkeypatch, tmp_path, config, expected_interval, expected_delay
+):
+    monkeypatch.setattr(StarTools, "get_data_dir", lambda *args: tmp_path)
+    instance = JipiaoPlugin(SimpleNamespace(), config)
+    assert instance.scheduler.round_interval == expected_interval
+    assert instance.scheduler.task_delay == expected_delay
+    instance.db.close()
+
     both_settings = validate_settings("北京", "上海", FUTURE, stop_policy="接受经停与中转")
     assert both_settings["allow_stopovers"] is True
     assert both_settings["allow_connections"] is True

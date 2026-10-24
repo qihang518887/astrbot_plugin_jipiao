@@ -11,6 +11,12 @@ policy selection, independent stopover/connection permissions and conversion
 to the existing plugin schema. No upstream account credentials are included.
 The Ctrip source requires Playwright on the query host, including the server.
 
+`calendar_search.py` adapts the Ctrip 15380 calendar request shape from
+`crawlers/special.py` in the same upstream project (Apache-2.0).
+Modifications on 2026-10-25: async plugin-local requests, same-month seven-day
+filtering, explicit fuzzy-date eligibility and single-day verification. Calendar
+reference prices are never written into monitoring observation or push history.
+
 The official QR login lifecycle in `ctrip_login.py` is plugin-specific; it uses
 the same browser launch settings and saves the confirmed session on the query host.
 

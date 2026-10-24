@@ -1,0 +1,85 @@
+{
+  "started_at": "2026-10-25T00:43:33.123708+08:00",
+  "route": [
+    "大连",
+    "上海"
+  ],
+  "center": "2026-11-05",
+  "window": [
+    "2026-11-02",
+    "2026-11-08"
+  ],
+  "calendar_calls": 1,
+  "detail_calls": 1,
+  "monitor_database_accessed": false,
+  "qq_message_sent": false,
+  "original_session_modified": false,
+  "calendar_days": [
+    {
+      "date": "2026-11-02",
+      "price": 292
+    },
+    {
+      "date": "2026-11-03",
+      "price": 292
+    },
+    {
+      "date": "2026-11-04",
+      "price": 292
+    },
+    {
+      "date": "2026-11-05",
+      "price": 292
+    },
+    {
+      "date": "2026-11-06",
+      "price": 292
+    },
+    {
+      "date": "2026-11-07",
+      "price": 292
+    },
+    {
+      "date": "2026-11-08",
+      "price": 320
+    }
+  ],
+  "calendar_candidate": {
+    "date": "2026-11-05",
+    "price": 292
+  },
+  "detail_quote_count": 23,
+  "verified_best": {
+    "itinerary_type": "nonstop",
+    "flight_no": "HO1166",
+    "airline": "吉祥航空",
+    "airline_code": "HO",
+    "dep_time": "21:40",
+    "arr_time": "23:45",
+    "arr_date": "2026-11-05",
+    "dep_airport": "DLC",
+    "arr_airport": "PVG",
+    "duration_minutes": 125,
+    "stops": 0,
+    "legs": [
+      {
+        "flight_no": "HO1166",
+        "airline": "吉祥航空",
+        "airline_code": "HO",
+        "dep_airport": "DLC",
+        "arr_airport": "PVG",
+        "dep_datetime": "2026-11-05T21:40:00",
+        "arr_datetime": "2026-11-05T23:45:00",
+        "duration_minutes": 125
+      }
+    ],
+    "layovers": [],
+    "self_transfer": false,
+    "price": 292,
+    "currency": "CNY",
+    "source": "携程 / Ctrip"
+  },
+  "calendar_price_matched": true,
+  "completed": true,
+  "finished_at": "2026-10-25T00:43:47.011976+08:00"
+}
