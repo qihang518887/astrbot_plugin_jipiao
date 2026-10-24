@@ -1,7 +1,7 @@
 import json
 from datetime import date, datetime
 from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import httpx
 import pytest
@@ -10,6 +10,7 @@ from astrbot_plugin_jipiao import calendar_search
 from astrbot_plugin_jipiao.algorithm import CHINA_TZ
 from astrbot_plugin_jipiao.calendar_search import (
     CalendarQueryError,
+    calendar_supports_scope,
     flexible_date_window,
     parse_calendar_days,
     select_calendar_lowest,
@@ -139,7 +140,12 @@ async def test_calendar_http_request_uses_one_call_city_codes_and_bounded_result
         calendar_search.httpx, "AsyncClient", lambda **kw: original(transport=transport)
     )
     result = await calendar_search.fetch_low_price_calendar(
-        "北京", "上海", "2026-11-02", "2026-11-08"
+        "北京",
+        "上海",
+        "2026-11-02",
+        "2026-11-08",
+        allow_stopovers=True,
+        allow_connections=True,
     )
     assert result == [{"date": CENTER, "price": 300}]
     assert len(requests) == 1
@@ -148,6 +154,31 @@ async def test_calendar_http_request_uses_one_call_city_codes_and_bounded_result
     assert body["arriveNewCityCode"] == "SHA"
     assert body["startDate"] == "2026-11-02"
     assert "cookie" not in requests[0].headers
+
+
+@pytest.mark.parametrize("stopovers,connections", [(False, False), (True, False), (False, True)])
+async def test_restricted_calendar_fetch_fails_before_http(monkeypatch, stopovers, connections):
+    client = Mock()
+    monkeypatch.setattr(calendar_search.httpx, "AsyncClient", client)
+    assert not calendar_supports_scope(stopovers, connections)
+    with pytest.raises(CalendarQueryError, match="不能分别排除"):
+        await calendar_search.fetch_low_price_calendar(
+            "大连",
+            "上海",
+            "2026-11-02",
+            "2026-11-08",
+            allow_stopovers=stopovers,
+            allow_connections=connections,
+        )
+    client.assert_not_called()
+
+
+async def test_calendar_fetch_defaults_to_safe_direct_scope(monkeypatch):
+    client = Mock()
+    monkeypatch.setattr(calendar_search.httpx, "AsyncClient", client)
+    with pytest.raises(CalendarQueryError):
+        await calendar_search.fetch_low_price_calendar("大连", "上海", CENTER, CENTER)
+    client.assert_not_called()
 
 
 class Event:
@@ -197,43 +228,60 @@ async def test_fuzzy_tool_verifies_only_one_date_and_never_writes_monitor_histor
     plugin, price, expected
 ):
     plugin.scheduler.fetcher.return_value = [quote(price)]
-    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    result = await plugin.search_flights_tool(
+        Event(), "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
     assert "同月范围 2026-11-02 至 2026-11-08" in result
     assert expected in result and f"¥{price}" in result
-    plugin.calendar_fetcher.assert_awaited_once_with("大连", "上海", "2026-11-02", "2026-11-08")
+    plugin.calendar_fetcher.assert_awaited_once_with(
+        "大连",
+        "上海",
+        "2026-11-02",
+        "2026-11-08",
+        allow_stopovers=True,
+        allow_connections=True,
+    )
     plugin.scheduler.fetcher.assert_awaited_once_with(
         "大连",
         "上海",
         "2026-11-04",
-        allow_stopovers=False,
-        allow_connections=False,
+        allow_stopovers=True,
+        allow_connections=True,
     )
     assert plugin.db.get_all_tasks() == []
 
 
 async def test_no_details_does_not_try_more_days_or_stop_policy_fallbacks(plugin):
-    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    result = await plugin.search_flights_tool(
+        Event(), "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
     assert "未核实" in result
     assert plugin.scheduler.fetcher.await_count == 1
 
 
 async def test_empty_calendar_does_not_trigger_any_detail_queries(plugin):
     plugin.calendar_fetcher.return_value = []
-    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    result = await plugin.search_flights_tool(
+        Event(), "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
     assert "没有有效参考价" in result
     plugin.scheduler.fetcher.assert_not_awaited()
 
 
 async def test_calendar_failure_does_not_scan_dates(plugin):
     plugin.calendar_fetcher.side_effect = CalendarQueryError("upstream unavailable")
-    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    result = await plugin.search_flights_tool(
+        Event(), "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
     assert "查询失败" in result
     plugin.scheduler.fetcher.assert_not_awaited()
 
 
 async def test_detail_failure_keeps_reference_explicitly_unverified(plugin):
     plugin.scheduler.fetcher.side_effect = TimeoutError("offline")
-    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    result = await plugin.search_flights_tool(
+        Event(), "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
     assert "最低参考价" in result and "未核实" in result
     assert plugin.scheduler.fetcher.await_count == 1
 
@@ -265,12 +313,14 @@ async def test_calendar_reference_never_changes_existing_monitor_task(plugin):
     plugin.db.update_last_pushed_price("u", 390)
     before = plugin.db.get_task("u")
     plugin.scheduler.fetcher.return_value = [quote(320)]
-    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    result = await plugin.search_flights_tool(
+        Event(), "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
     assert "未成立" in result
     assert plugin.db.get_task("u") == before
 
 
-async def test_fuzzy_details_apply_user_time_and_stop_constraints(plugin):
+async def test_fuzzy_details_keep_user_time_and_stop_constraints_when_calendar_is_skipped(plugin):
     plugin.scheduler.fetcher.return_value = [quote()]
     result = await plugin.search_flights_tool(
         Event(),
@@ -280,11 +330,59 @@ async def test_fuzzy_details_apply_user_time_and_stop_constraints(plugin):
         time_window="12:00-18:00",
         allow_connections=True,
     )
-    assert "未核实" in result
+    assert "低价日历已跳过" in result
+    assert "未在原日期" in result
+    plugin.calendar_fetcher.assert_not_awaited()
     plugin.scheduler.fetcher.assert_awaited_once_with(
         "大连",
         "上海",
-        "2026-11-04",
+        CENTER,
         allow_stopovers=False,
         allow_connections=True,
+    )
+
+
+@pytest.mark.parametrize("stopovers,connections", [(False, False), (True, False), (False, True)])
+@pytest.mark.parametrize("has_quote", [False, True])
+async def test_fuzzy_calendar_cannot_pick_dates_using_forbidden_itinerary_prices(
+    plugin, stopovers, connections, has_quote
+):
+    # The forbidden calendar would pick a different date with a cheap connection.
+    plugin.calendar_fetcher.return_value = [{"date": "2026-11-02", "price": 99}]
+    plugin.scheduler.fetcher.return_value = (
+        [{**quote(320), "arr_date": CENTER}] if has_quote else []
+    )
+    plugin.db.upsert_task("u", "qq:FriendMessage:1", "DLC", "SHA", "2099-12-01")
+    plugin.db.update_lowest_3("u", '[{"p":400,"t":1}]')
+    before = plugin.db.get_task("u")
+    result = await plugin.search_flights_tool(
+        Event(),
+        "大连",
+        "上海",
+        CENTER,
+        allow_stopovers=stopovers,
+        allow_connections=connections,
+    )
+    plugin.calendar_fetcher.assert_not_awaited()
+    plugin.scheduler.fetcher.assert_awaited_once_with(
+        "大连", "上海", CENTER, allow_stopovers=stopovers, allow_connections=connections
+    )
+    assert "低价日历已跳过" in result
+    assert "2026-11-02" not in result
+    assert "¥99" not in result
+    assert "最低参考价" not in result
+    if has_quote:
+        assert "符合条件最低价: ¥320" in result
+    else:
+        assert "未在原日期" in result
+    assert plugin.db.get_task("u") == before
+
+
+async def test_fuzzy_query_defaults_to_direct_without_calendar_or_fallback(plugin):
+    result = await plugin.search_flights_tool(Event(), "大连", "上海", CENTER)
+    assert "低价日历已跳过" in result
+    assert "未自动追加经停或中转查询" in result
+    plugin.calendar_fetcher.assert_not_awaited()
+    plugin.scheduler.fetcher.assert_awaited_once_with(
+        "大连", "上海", CENTER, allow_stopovers=False, allow_connections=False
     )

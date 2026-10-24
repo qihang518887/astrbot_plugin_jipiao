@@ -22,6 +22,16 @@ class CalendarQueryError(RuntimeError):
     """A calendar failure safe to display without session or proxy credentials."""
 
 
+def calendar_supports_scope(allow_stopovers: bool, allow_connections: bool) -> bool:
+    """Daily aggregate prices cannot enforce independent stop/connection exclusions.
+
+    Enable discovery only when the user accepts every itinerary type. The API
+    rows have no stop/connection classification; filtering details afterwards
+    cannot repair the calendar's choice of date.
+    """
+    return allow_stopovers and allow_connections
+
+
 def flexible_date_window(
     message: str, flight_date: str, airlines: str | None, *, today: date | None = None
 ) -> tuple[str, str] | None:
@@ -112,9 +122,19 @@ def select_calendar_lowest(days: list[dict], center_date: str) -> dict | None:
 
 
 async def fetch_low_price_calendar(
-    dep_city: str, arr_city: str, start_date: str, end_date: str
+    dep_city: str,
+    arr_city: str,
+    start_date: str,
+    end_date: str,
+    *,
+    allow_stopovers: bool = False,
+    allow_connections: bool = False,
 ) -> list[dict]:
     """Request Ctrip once and discard dates outside the requested same-month range."""
+    if not calendar_supports_scope(allow_stopovers, allow_connections):
+        raise CalendarQueryError(
+            "当前低价日历不能分别排除经停或中转，已跳过日历；请按原日期和航程限制查询明细。"
+        )
     departure, arrival = resolve_airports(dep_city)[0], resolve_airports(arr_city)[0]
     payload = {
         "searchType": 1,

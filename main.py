@@ -21,7 +21,12 @@ from astrbot.core.platform.message_session import MessageSession
 from astrbot.core.platform.message_type import MessageType
 
 from .algorithm import CHINA_TZ, normalize_lowest_3, task_phase
-from .calendar_search import fetch_low_price_calendar, flexible_date_window, select_calendar_lowest
+from .calendar_search import (
+    calendar_supports_scope,
+    fetch_low_price_calendar,
+    flexible_date_window,
+    select_calendar_lowest,
+)
 from .ctrip_login import qr_login
 from .database import FlightDB
 from .fetcher import (
@@ -115,7 +120,7 @@ def validate_settings(
     }
 
 
-@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.7.1")
+@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.7.2")
 class JipiaoPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
@@ -353,7 +358,7 @@ class JipiaoPlugin(Star):
         allow_stopovers: bool = False,
         allow_connections: bool = False,
     ) -> str:
-        """查询机票。低价日历默认关闭：仅原话明确说某日左右、大概某日等模糊日期且未指定航司时，查询同月前后三天，选日历最低价当天核实一次明细；不可把参考价当作核实结果。指定日期或航司时只查原日期。普通查询默认先直飞，无结果才依次查经停、中转备选；日历核实不逐日扫描或自动追加备选。备选不代表用户同意监控经停或中转。须告知停靠机场和跨日到达。
+        """查询机票。低价日历默认关闭：仅原话明确说某日左右、大概某日等模糊日期、未指定航司，且用户明确同时接受经停和中转时，查询同月前后三天，选日历最低价当天核实一次明细；不可把参考价当作核实结果。关闭经停或中转任一项时，混合价格日历不适用，保留中心日期只查符合开关的明细，不自动扩大航程范围。不得为了启用日历擅自把开关设为 true。指定日期或航司时只查原日期。普通查询默认先直飞，无结果才依次查经停、中转备选；模糊日期查询不逐日扫描或自动追加备选。备选不代表用户同意监控经停或中转。须告知停靠机场和跨日到达。
 
         Args:
             dep_city(string): 出发城市名称或机场三字码，例如北京、上海、PEK
@@ -379,16 +384,31 @@ class JipiaoPlugin(Star):
             date_range = (
                 None if self.mock else flexible_date_window(message, flight_date, norm_airlines)
             )
-            if date_range:
+            if date_range and not calendar_supports_scope(allow_stopovers, allow_connections):
+                calendar_note = (
+                    "【低价日历已跳过】当前日历的每日参考价混合了直飞、经停及中转，"
+                    "无法按经停和中转开关分别排除。\n"
+                    f"您当前只接受{describe_scope(allow_stopovers, allow_connections)}；"
+                    f"保留中心日期 {flight_date}，仅核实当天符合条件的明细，不逐日扫描或扩大航程范围。\n"
+                )
+            elif date_range:
                 center_date = flight_date
                 start_date, end_date = date_range
-                days = await self.calendar_fetcher(dep_city, arr_city, start_date, end_date)
+                days = await self.calendar_fetcher(
+                    dep_city,
+                    arr_city,
+                    start_date,
+                    end_date,
+                    allow_stopovers=allow_stopovers,
+                    allow_connections=allow_connections,
+                )
                 calendar_choice = select_calendar_lowest(days, center_date)
                 if calendar_choice is None:
                     return f"低价日历在 {start_date} 至 {end_date} 没有有效参考价，本次未继续逐日查询。"
                 flight_date = calendar_choice["date"]
                 calendar_note = (
                     f"【模糊日期低价日历】中心日期 {center_date}，同月范围 {start_date} 至 {end_date}。\n"
+                    "日历范围：直飞、经停及中转（用户已全部接受）。\n"
                     f"最低参考价：{flight_date}，¥{calendar_choice['price']}；仅核实此候选日，不逐日扫描。\n"
                 )
 
@@ -401,7 +421,7 @@ class JipiaoPlugin(Star):
                 best = filter_and_get_lowest(flights, window, norm_airlines)
 
                 # Step 2: Fallback to stopovers
-                if not best and calendar_choice is None:
+                if not best and not date_range:
                     stopover_flights = await self.scheduler.fetcher(
                         dep_city,
                         arr_city,
@@ -428,7 +448,7 @@ class JipiaoPlugin(Star):
                         flights = stopover_candidates
 
                 # Step 3: Fallback to connections
-                if not best and calendar_choice is None:
+                if not best and not date_range:
                     conn_flights = await self.scheduler.fetcher(
                         dep_city,
                         arr_city,
@@ -455,6 +475,11 @@ class JipiaoPlugin(Star):
                         flights = conn_candidates
 
                 if not best:
+                    if date_range and calendar_choice is None:
+                        return (
+                            calendar_note
+                            + "未在原日期查到符合条件的直飞明细，未自动追加经停或中转查询。"
+                        )
                     if calendar_choice is not None:
                         return (
                             calendar_note
@@ -475,6 +500,11 @@ class JipiaoPlugin(Star):
                 )
                 best = filter_and_get_lowest(flights, window, norm_airlines)
                 if not best:
+                    if date_range and calendar_choice is None:
+                        return (
+                            calendar_note
+                            + "未在原日期查到符合您航程类型和时段要求的明细，未自动扩大查询范围。"
+                        )
                     if calendar_choice is not None:
                         return (
                             calendar_note
