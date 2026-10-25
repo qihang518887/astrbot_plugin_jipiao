@@ -105,6 +105,35 @@ async def test_scheduler_persists_distinct_observation_prices_across_six_hour_ga
     send.assert_not_awaited()
 
 
+async def test_scheduler_blacklist_excludes_quotes_from_observations_and_alerts(db, monkeypatch):
+    from astrbot_plugin_jipiao.algorithm import DAY, flight_timestamp
+
+    now = flight_timestamp("2030-12-01") - 50 * DAY
+    monkeypatch.setattr("astrbot_plugin_jipiao.scheduler.time.time", lambda: now)
+    db.upsert_task("u1", "qq:FriendMessage:1", "PEK", "SHA", "2030-12-01", airlines="!9C")
+    blocked = {**QUOTE, "flight_no": "9C123", "airline_code": "9C", "price": 99}
+    fetch = AsyncMock(return_value=[blocked, QUOTE])
+    send = AsyncMock()
+    scheduler = MonitorScheduler(
+        db, send, send_observation_callback=AsyncMock(), fetcher=fetch, round_interval=0
+    )
+    await scheduler._process_one(db.get_task("u1"))
+    records = json.loads(db.get_task("u1")["lowest_3_json"])
+    assert [item["p"] for item in records] == [400]
+    assert json.loads(db.get_task("u1")["last_best_json"])["flight_no"] == "CA123"
+    fetch.return_value = [blocked]
+    await scheduler._process_one(db.get_task("u1"))
+    assert json.loads(db.get_task("u1")["lowest_3_json"]) == records
+    send.assert_not_awaited()
+    now += 20 * DAY
+    fetch.return_value = [blocked, {**QUOTE, "price": 399}]
+    await scheduler._process_one(db.get_task("u1"))
+    send.assert_awaited_once()
+    assert "CA123" in send.call_args.args[1] and "9C123" not in send.call_args.args[1]
+    assert db.get_task("u1")["last_pushed_price"] == 399
+    assert json.loads(db.get_task("u1")["lowest_3_json"]) == records
+
+
 async def test_expired_task_deleted_without_network(db):
     db.upsert_task("u1", "qq:FriendMessage:1", "PEK", "SHA", "2000-01-01")
     fetch, send = AsyncMock(), AsyncMock()

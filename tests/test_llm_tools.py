@@ -50,6 +50,9 @@ def test_llm_tools_registered():
     assert search_params["flight_date"]["type"] == "string"
     assert search_params["allow_stopovers"]["type"] == "boolean"
     assert search_params["allow_connections"]["type"] == "boolean"
+    for name in ["search_flights", "set_flight_monitor"]:
+        description = tools[name].parameters["properties"]["airlines"]["description"]
+        assert "!9C,!KN" in description and "排除" in description
     assert "allow_stopovers" not in tools["search_flights"].parameters.get("required", [])
     assert "allow_connections" not in tools["search_flights"].parameters.get("required", [])
     assert (
@@ -269,6 +272,42 @@ async def test_monitor_stop_permission_is_explicit_and_persisted(plugin):
     assert task["allow_stopovers"] == 0
     assert task["allow_connections"] == 0
     assert "仅直飞" in await plugin.get_flight_monitor_tool(DummyEvent())
+
+
+async def test_llm_monitor_accepts_blacklist_only_and_keeps_it_on_restart(plugin):
+    response = await plugin.set_flight_monitor_tool(
+        DummyEvent(), "北京", "上海", FUTURE, airlines="!春秋,!联航"
+    )
+    assert "排除 9C、KN" in response and "其余航司不限" in response
+    before = plugin.db.get_all_tasks()[0]
+    assert before["airlines"] == "!9C,!KN"
+    from astrbot_plugin_jipiao.database import FlightDB
+
+    path = plugin.db.conn.execute("PRAGMA database_list").fetchone()[2]
+    reopened = FlightDB(path)
+    try:
+        assert reopened.get_all_tasks()[0] == before
+    finally:
+        reopened.close()
+    assert "排除 9C、KN" in await plugin.get_flight_monitor_tool(DummyEvent())
+
+
+async def test_fallback_never_reintroduces_a_blacklisted_airline(plugin, connecting_quote):
+    direct = dict(
+        connecting_quote,
+        flight_no="9C123",
+        airline_code="9C",
+        price=99,
+        stops=0,
+        itinerary_type="nonstop",
+    )
+    stopover = dict(direct, flight_no="9C456", itinerary_type="stopover", stops=1)
+    plugin.scheduler.fetcher = AsyncMock(side_effect=[[direct], [stopover], [connecting_quote]])
+    result = await plugin.search_flights_tool(DummyEvent(), "北京", "上海", FUTURE, airlines="!9C")
+    assert plugin.scheduler.fetcher.await_count == 3
+    assert "KE2224 / KE2071" in result
+    assert "9C123" not in result and "9C456" not in result and "¥99" not in result
+    assert "排除 9C" in result
 
 
 async def test_fallback_applies_filters_and_keeps_existing_monitor_unchanged(

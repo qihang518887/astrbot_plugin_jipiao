@@ -386,3 +386,26 @@ async def test_fuzzy_query_defaults_to_direct_without_calendar_or_fallback(plugi
     plugin.scheduler.fetcher.assert_awaited_once_with(
         "大连", "上海", CENTER, allow_stopovers=False, allow_connections=False
     )
+
+
+async def test_airline_blacklist_disables_mixed_calendar_even_when_all_stops_allowed(plugin):
+    plugin.scheduler.fetcher.return_value = [
+        {**quote(99), "flight_no": "9C123", "airline_code": "9C", "arr_date": CENTER},
+        {**quote(320), "arr_date": CENTER},
+    ]
+    result = await plugin.search_flights_tool(
+        Event(),
+        "大连",
+        "上海",
+        CENTER,
+        airlines="!春秋",
+        allow_stopovers=True,
+        allow_connections=True,
+    )
+    plugin.calendar_fetcher.assert_not_awaited()
+    plugin.scheduler.fetcher.assert_awaited_once_with(
+        "大连", "上海", CENTER, allow_stopovers=True, allow_connections=True
+    )
+    assert "符合条件最低价: ¥320" in result
+    assert "9C123" not in result and "¥99" not in result
+    assert "排除 9C" in result

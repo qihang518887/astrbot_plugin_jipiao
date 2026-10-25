@@ -111,19 +111,65 @@ def resolve_airports(city: str) -> tuple[str, ...]:
 
 
 def normalize_airlines(airlines: str | None) -> str | None:
-    if not airlines or airlines == "-":
+    """Normalize optional allow entries and !-prefixed airline exclusions."""
+    if not airlines or airlines.strip() in {"", "-"}:
         return None
     from fli.models import Airline
 
     codes = []
     for value in airlines.replace("，", ",").split(","):
         value = value.strip().upper()
+        excluded = value.startswith(("!", "！"))
+        if excluded:
+            value = value[1:].strip()
         code = AIRLINE_ALIASES.get(value, value)
         if code not in Airline.__members__ and f"_{code}" not in Airline.__members__:
             raise ValueError(f"暂不认识航司：{value or '空值'}。请使用航司二字码，例如 CA,MU,3U。")
-        if code not in codes:
-            codes.append(code)
+        entry = ("!" if excluded else "") + code
+        if entry not in codes:
+            codes.append(entry)
     return ",".join(codes)
+
+
+def airline_rules(airlines: str | None) -> tuple[set[str], set[str]]:
+    """Return allowed and blocked marketing carrier codes; exclusions take priority."""
+    entries = (normalize_airlines(airlines) or "").split(",")
+    return (
+        {entry for entry in entries if entry and not entry.startswith("!")},
+        {entry[1:] for entry in entries if entry.startswith("!")},
+    )
+
+
+def describe_airlines(airlines: str | None) -> str:
+    allowed, blocked = airline_rules(airlines)
+    labels = []
+    if allowed:
+        labels.append("仅限 " + "、".join(sorted(allowed)))
+    if blocked:
+        labels.append("排除 " + "、".join(sorted(blocked)))
+        if not allowed:
+            labels.append("其余航司不限")
+    return "；".join(labels) or "不限"
+
+
+def _flight_airlines(flight: dict) -> set[str]:
+    """Check every marketing carrier, including legacy quotes without a summary."""
+    codes = {
+        value.strip().upper()
+        for value in (flight.get("airline_code") or "").split(",")
+        if value.strip()
+    }
+    for leg in flight.get("legs") or []:
+        code = leg.get("airline_code") or (leg.get("flight_no") or "")[:2]
+        if code:
+            codes.add(code.strip().upper())
+    if not codes:
+        codes = {
+            number.strip()[:2].upper()
+            for number in (flight.get("flight_no") or "").split("/")
+            if number.strip()
+        }
+    return codes
 
 
 def validate_time_window(value: str | None) -> str | None:
@@ -258,19 +304,15 @@ def filter_and_get_lowest(
 ) -> dict | None:
     window = validate_time_window(time_window)
     valid = []
-    keywords = [
-        AIRLINE_ALIASES.get(v.strip().upper(), v.strip().upper())
-        for v in (airlines or "").replace("，", ",").split(",")
-        if v.strip()
-    ]
+    allowed, blocked = airline_rules(airlines)
     for flight in flights:
         if window:
             start, end = window.split("-")
             if not start <= flight["dep_time"] <= end:
                 continue
-        if keywords:
-            codes = flight.get("airline_code", flight["flight_no"][:2]).upper().split(",")
-            if not all(code in keywords for code in codes):
+        if allowed or blocked:
+            codes = _flight_airlines(flight)
+            if not codes or codes & blocked or (allowed and not codes <= allowed):
                 continue
         valid.append(flight)
     return min(valid, key=lambda flight: flight["price"]) if valid else None

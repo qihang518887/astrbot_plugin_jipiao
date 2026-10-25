@@ -22,6 +22,66 @@ def test_chinese_airline_mapping_and_numeric_code():
     assert fetcher.normalize_airlines("国航，东航,3U,CA") == "CA,MU,3U"
 
 
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("!春秋,!联航", "!9C,!KN"),
+        (" !9c，！春秋航空,!kn ", "!9C,!KN"),
+        ("!川航,!3u", "!3U"),
+        ("CA,MU,!东航,!春秋", "CA,MU,!MU,!9C"),
+        (" - ", None),
+    ],
+)
+def test_airline_blacklist_normalization(value, expected):
+    assert fetcher.normalize_airlines(value) == expected
+
+
+@pytest.mark.parametrize("value", ["!", "!!CA", "!不存在", "!ZZZ", "!CA,", "!CA,,!MU"])
+def test_invalid_blacklist_is_rejected(value):
+    with pytest.raises(ValueError):
+        fetcher.normalize_airlines(value)
+
+
+def test_blacklist_only_allows_other_airlines_and_preserves_time_filter():
+    flights = [
+        {"flight_no": "9C123", "dep_time": "10:00", "price": 100},
+        {"flight_no": "KN123", "dep_time": "10:00", "price": 200},
+        {"flight_no": "CA123", "dep_time": "18:01", "price": 250},
+        {"flight_no": "MU123", "dep_time": "18:00", "price": 300},
+    ]
+    assert fetcher.filter_and_get_lowest(flights, "08:00-18:00", "!春秋,!联航") == flights[3]
+    assert fetcher.filter_and_get_lowest(flights, None, "!9C,!KN") == flights[2]
+    assert fetcher.filter_and_get_lowest(flights[:2], None, "!9C,!KN") is None
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"airline_code": "CA,9C", "flight_no": "CA123 / 9C456"},
+        {"flight_no": "CA123 / 9C456"},
+        {"airline_code": "CA", "legs": [{"airline_code": "CA"}, {"airline_code": "9c"}]},
+        {"airline_code": "CA", "legs": [{"flight_no": "CA123"}, {"flight_no": "9C456"}]},
+    ],
+)
+def test_blacklisted_later_leg_excludes_entire_connection(fields):
+    flight = {"flight_no": "CA123", "dep_time": "10:00", "price": 100, **fields}
+    assert fetcher.filter_and_get_lowest([flight], None, "!9C") is None
+
+
+def test_blacklist_takes_priority_when_combined_with_whitelist():
+    flights = [
+        {"flight_no": "MU123", "dep_time": "10:00", "price": 100},
+        {"flight_no": "CA123", "dep_time": "10:00", "price": 200},
+        {"flight_no": "CZ123", "dep_time": "10:00", "price": 50},
+    ]
+    assert fetcher.filter_and_get_lowest(flights, None, "CA,MU,!MU") == flights[1]
+    assert fetcher.filter_and_get_lowest(flights[:1], None, "MU,!MU") is None
+
+
+def test_airline_constraints_reject_quotes_without_carrier_identity():
+    assert fetcher.filter_and_get_lowest([{"dep_time": "10:00", "price": 50}], None, "!9C") is None
+
+
 @pytest.mark.parametrize("window", ["24:00-25:00", "8:00-18:00", "18:00-08:00", "12:61-13:00"])
 def test_invalid_time_window(window):
     with pytest.raises(ValueError):

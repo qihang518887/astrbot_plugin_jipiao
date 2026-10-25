@@ -84,6 +84,9 @@ def test_connection_full_price_all_carriers_time_filter_and_crossday(raw):
     assert fetcher.filter_and_get_lowest([quote], None, "SC") is None
     assert fetcher.filter_and_get_lowest([quote], "17:01-20:00", "SC,MU") is None
     assert fetcher.filter_and_get_lowest([quote], "17:00-17:00", "SC,MU") == quote
+    assert fetcher.filter_and_get_lowest([quote], None, "!MU") is None
+    assert fetcher.filter_and_get_lowest([quote], None, "!SC") is None
+    assert fetcher.filter_and_get_lowest([quote], None, "!9C,!KN") == quote
 
 
 def test_combined_connection_and_technical_stop_requires_both_permissions(raw):

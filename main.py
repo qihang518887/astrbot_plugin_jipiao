@@ -30,6 +30,7 @@ from .calendar_search import (
 from .ctrip_login import qr_login
 from .database import FlightDB
 from .fetcher import (
+    describe_airlines,
     describe_itinerary,
     describe_scope,
     fetch_mock_flights,
@@ -46,6 +47,8 @@ USAGE = (
     "不限制的可选项用 - 占位；日期必须晚于北京时间今天。\n"
     "示例：/机票监控 北京 上海 2026-12-01 08:00-18:00 国航,东航 500\n"
     "只设目标价：/机票监控 PEK SHA 2026-12-01 - - 500\n"
+    "排除航司：/机票监控 北京 上海 2026-12-01 - !春秋,!联航\n"
+    "航司前加 ! 表示黑名单，例如 !9C,!KN；不加 ! 的旧白名单写法仍可用。\n"
     "不设目标价将使用37%观察策略。默认只监控直飞；末尾填写 接受经停、接受中转 或 接受经停与中转 才纳入非直飞行程。"
 )
 
@@ -66,7 +69,7 @@ def validate_settings(
         arr_city: Arrival city or airport code.
         flight_date: Departure date strictly formatted as YYYY-MM-DD.
         time_window: Inclusive local departure interval, or '-'.
-        airlines: Comma-separated airline aliases or codes, or '-'.
+        airlines: Comma-separated airline aliases/codes; prefix each exclusion with '!', or '-'.
         target_price: Positive whole-yuan threshold, or '-'.
         stop_policy: '直飞' by default, or '接受经停', '接受中转', '接受经停与中转'.
 
@@ -120,7 +123,7 @@ def validate_settings(
     }
 
 
-@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.7.2")
+@register("astrbot_plugin_jipiao", "Local", "机票低价监控与 QQ 主动提醒", "0.7.3")
 class JipiaoPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
@@ -287,7 +290,7 @@ class JipiaoPlugin(Star):
             + ("，已覆盖您原有的监控任务。" if existed else "。")
             + f"\n{settings['dep_city']} → {settings['arr_city']}｜{flight_date}\n"
             + f"出发机场：{','.join(resolve_airports(dep_city))}；到达机场：{','.join(resolve_airports(arr_city))}\n"
-            + f"起飞时段：{settings['time_window'] or '不限'}；航司：{settings['airlines'] or '不限'}\n"
+            + f"起飞时段：{settings['time_window'] or '不限'}；航司：{describe_airlines(settings['airlines'])}\n"
             + f"{mode}\n单程、1成人、经济舱、人民币。\n"
             + scope_detail
             + "提醒发送到本次设置所在的会话；同一平台账号每人一个任务。\n"
@@ -314,7 +317,7 @@ class JipiaoPlugin(Star):
         text = (
             ("【模拟模式，不是真实票价】\n" if self.mock else "")
             + f"{task['dep_city']} → {task['arr_city']}｜{task['flight_date']}\n"
-            + f"时间段：{task['time_window'] or '不限'}；航司：{task['airlines'] or '不限'}\n"
+            + f"时间段：{task['time_window'] or '不限'}；航司：{describe_airlines(task['airlines'])}\n"
             + f"航程类型：{scope_text}\n"
             + f"目标价：{'¥' + str(task['target_price']) if task['target_price'] is not None else '未设置'}\n"
             + f"当前阶段：{phase}\n观察期最低3个不同价格：{recorded}\n"
@@ -365,7 +368,7 @@ class JipiaoPlugin(Star):
             arr_city(string): 到达城市名称或机场三字码，例如广州、深圳、SHA
             flight_date(string): 明确日期或模糊日期的中心日，格式 YYYY-MM-DD，例如用户说11月5日左右则传2026-11-05；是否启用日历由原始消息判断，不得自行扩大日期
             time_window(string): 可选出发时段，格式为 HH:MM-HH:MM，不限填 '-'
-            airlines(string): 可选航司白名单，逗号分隔，如国航,东航或CA,MU，不限填 '-'
+            airlines(string): 可选航司筛选；用户说不要/排除某航司时，每家前加 !，如 !春秋,!联航 或 !9C,!KN，表示其余航司不限；不要将排除误写为白名单。旧白名单可写 CA,MU；黑名单优先，任一航段命中即排除整程。不限填 '-'。有黑名单时也不使用低价日历
             allow_stopovers(boolean): 默认 false；仅用户明确接受经停时传 true，不可根据直飞无结果自行设 true
             allow_connections(boolean): 默认 false；仅用户明确接受换乘中转时传 true，不可根据直飞无结果自行设 true
         """
@@ -531,6 +534,7 @@ class JipiaoPlugin(Star):
             lines = [
                 f"【机票实时查询结果】{dep_city} -> {arr_city} | 日期: {flight_date}",
                 scope_note,
+                f"航司筛选：{describe_airlines(norm_airlines)}",
                 f"符合条件最低价: ¥{best['price']} ({best['flight_no']} {best['airline']}, 起飞 {best['dep_time']}，到达 {best['arr_date']} {best['arr_time']})",
                 describe_itinerary(best),
                 f"共查询到 {len(flights)} 条行程报价，符合筛选 {len(matched)} 条，以下为最便宜的前 5 条：",
@@ -542,7 +546,7 @@ class JipiaoPlugin(Star):
                 )
             lines.append(
                 "注：以上为单程成人经济舱人民币报价；经停/中转行程可能跨境或过夜。"
-                "航司白名单适用于全部航段的营销航司；实际票价、税费及出入境要求以订票渠道为准。"
+                "航司白名单要求全部航段符合，黑名单命中任一航段的营销航司即排除整程；实际票价、税费及出入境要求以订票渠道为准。"
             )
             if calendar_choice is not None:
                 reference = calendar_choice["price"]
@@ -583,7 +587,7 @@ class JipiaoPlugin(Star):
             arr_city(string): 到达城市名称或机场三字码，例如广州、深圳、SHA
             flight_date(string): 出发日期，格式必须为 YYYY-MM-DD，必须晚于今天，例如 2026-11-25
             time_window(string): 可选出发时段，格式为 HH:MM-HH:MM，不限填 '-'
-            airlines(string): 可选航司白名单，逗号分隔，如国航,东航或CA,MU，不限填 '-'
+            airlines(string): 可选航司筛选；用户说不要/排除某航司时，每家前加 !，如 !春秋,!联航 或 !9C,!KN，表示其余航司不限；不要将排除误写为白名单。旧白名单可写 CA,MU；黑名单优先，任一航段命中即排除整程。不限填 '-'
             target_price(number): 可选目标价格（人民币正整数）；不设置时传 null，自动启用 37% 观察策略
             allow_stopovers(boolean): 默认 false；只有用户明确接受同航班号经停时才传 true
             allow_connections(boolean): 默认 false；只有用户明确接受换乘中转时才传 true
@@ -633,10 +637,10 @@ class JipiaoPlugin(Star):
         return (
             f"已成功开启机票低价监控{'（已覆盖原有监控任务）' if existed else ''}：\n"
             f"航线：{settings['dep_city']} → {settings['arr_city']}，出发日期：{flight_date}。\n"
-            f"筛选条件：起飞时段 {settings['time_window'] or '不限'}，航司 {settings['airlines'] or '不限'}。\n"
+            f"筛选条件：起飞时段 {settings['time_window'] or '不限'}，航司 {describe_airlines(settings['airlines'])}。\n"
             f"监控模式：{mode_desc}。\n"
             f"航程类型：{scope_detail}。\n"
-            "单程成人经济舱；航司白名单适用于全部航段。\n"
+            "单程成人经济舱；航司白名单要求全部航段符合，黑名单命中任一航段即排除整程。\n"
             "系统将在后台自动轮询，并在满足降价条件时主动推送消息提醒。出发日北京时间零点自动结束。"
         )
 
@@ -660,7 +664,7 @@ class JipiaoPlugin(Star):
         lines = [
             "【您的机票监控任务详情】",
             f"航线: {task['dep_city']} → {task['arr_city']} | 出发日期: {task['flight_date']}",
-            f"筛选条件: 时段 {task['time_window'] or '不限'} | 航司 {task['airlines'] or '不限'}",
+            f"筛选条件: 时段 {task['time_window'] or '不限'} | 航司 {describe_airlines(task['airlines'])}",
             f"航程类型: {scope_text}",
             f"目标价: {'¥' + str(task['target_price']) if task['target_price'] is not None else '未设置(启用37%观察策略)'}",
             f"当前阶段: {phase}",

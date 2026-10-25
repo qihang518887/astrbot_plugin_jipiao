@@ -146,6 +146,27 @@ async def test_invalid_replacement_preserves_existing_task(plugin):
     assert plugin.db.get_all_tasks()[0] == before
 
 
+async def test_command_blacklist_is_normalized_persisted_and_displayed(plugin):
+    command = CommandFilter(
+        "机票监控", handler_md=SimpleNamespace(handler=JipiaoPlugin.set_monitor)
+    )
+    kwargs = command.validate_and_convert_params(
+        ["PEK", "SHA", FUTURE, "-", "!春秋,!联航", "500"], command.handler_params
+    )
+    reply = await anext(plugin.set_monitor(Event(), **kwargs))
+    assert "排除 9C、KN" in reply and "其余航司不限" in reply
+    assert plugin.db.get_all_tasks()[0]["airlines"] == "!9C,!KN"
+    for text in [
+        await anext(plugin.my_monitor(Event())),
+        await plugin.get_flight_monitor_tool(Event()),
+    ]:
+        assert "排除 9C、KN" in text and "其余航司不限" in text
+    before = plugin.db.get_all_tasks()[0]
+    invalid = await anext(plugin.set_monitor(Event(), "PEK", "SHA", FUTURE, airlines="!不存在"))
+    assert "暂不认识航司" in invalid
+    assert plugin.db.get_all_tasks()[0] == before
+
+
 async def test_command_and_llm_status_display_distinct_observation_prices(plugin):
     await anext(plugin.set_monitor(Event(), "PEK", "SHA", FUTURE))
     with plugin.db.conn:
