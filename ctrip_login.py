@@ -26,8 +26,9 @@ class CtripQRLogin:
         self.page.set_default_timeout(45_000)
         await self.page.goto(LOGIN_URL, wait_until="domcontentloaded")
         await self.page.get_by_role("link", name="扫码登录", exact=True).click()
-        qr = self.page.get_by_test_id("qrCodeBox").locator("canvas")
-        await qr.wait_for(state="visible")
+        # 2026-11 起携程登录页改用内联 <svg> 画码（旧版是 <canvas>），且二维码晚于面板注入。
+        qr = self.page.get_by_test_id("qrCodeBox")
+        await qr.locator("svg, canvas").first.wait_for(state="visible")
         return await qr.screenshot(type="png", scale="css")
 
     async def wait_and_save(self, path: Path):

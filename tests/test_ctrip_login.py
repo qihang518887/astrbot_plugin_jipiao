@@ -20,9 +20,9 @@ def page_context():
     page.goto = AsyncMock()
     page.wait_for_url = AsyncMock()
     page.get_by_role.return_value.click = AsyncMock()
-    canvas = page.get_by_test_id.return_value.locator.return_value
-    canvas.wait_for = AsyncMock()
-    canvas.screenshot = AsyncMock(return_value=b"official-qr-png")
+    qr = page.get_by_test_id.return_value
+    qr.locator.return_value.first.wait_for = AsyncMock()
+    qr.screenshot = AsyncMock(return_value=b"official-qr-png")
     state = {
         "cookies": [
             {"domain": ".ctrip.com", "name": "session", "value": "test-private"},
